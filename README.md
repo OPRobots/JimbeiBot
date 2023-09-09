@@ -1,21 +1,21 @@
 # JimbeiBot
 
-Robot minisumo con Arduino Nano, motores Brushless de medio caballo de poder y sensores SHARP.
+Robot minisumo con ESP32 C3 super mini, motores Brushless de medio caballo de poder y sensores SHARP.
 
 ![JimbeiBot](./images/JimbeiBot_finish.png "JimbeiBot")
 
 ## Hardware
-- Arduino Nano
-- 2x ESC BlHeli
-- 2x Motores Brushless de alto torque
-- DIP Switch 4p
+- ESP32 C3 super mini
+- 2x ESC BlHeli 20A
+- 2x Motores Brushless de alto torque 2216
+- 4 Leds
 - LiPo 2S ~2000 mAh
-- 2x Sensores SHARP GP2Y0A41SK0F
+- 4x Sensores SHARP GP2Y0E03 
 - Goma de ruedas hecha a medida con Uretano/Vitaflex20
 - Chasis completamente impreso en PLA
+- Pletina de cobre para aumentar peso
 ![JimbeiBot Chasis](./images/JimbeiBot_3d_model.png "JimbeiBot - Chasis")
 
 ## Software
-- Programado con Arduino IDE
-- Uso de librería TimerOne de Arduino
-- Disponible programa básico de minisumo
+- Programado con Visual Estudio Code con Arduino
+- Disponible programa básico de minisumo con PID
