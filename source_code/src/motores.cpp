@@ -1,6 +1,6 @@
 #include "motores.h"
 
-#define UMBRAL_COGGIN 105
+#define UMBRAL_COGGIN 120
 
 const int MAGNITUD_FILTRO = 20;
 
@@ -93,4 +93,39 @@ void parar_motores() {
   Vel_I = 0;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+}
+
+void secuencia_linea_D(){
+  Vel_D = 0;
+  Vel_I = 0;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay (50);
+  Vel_D = -500;
+  Vel_I = -500;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(100);
+  Vel_D = 200;
+  Vel_I = -200;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(200);
+}
+void secuencia_linea_I(){
+  Vel_D = 0;
+  Vel_I = 0;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay (50);
+  Vel_D = -500;
+  Vel_I = -500;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(100);
+  Vel_D = -200;
+  Vel_I = 200;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(200);
 }

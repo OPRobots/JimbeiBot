@@ -27,32 +27,37 @@
 #define NUM_ESTRATEGIAS 5
 
 #define ESTRAT_ADELANTE 0
-#define ESTRAT_DERECHA 1
-#define ESTRAT_IZQUIERDA 2
-#define ESTRAT_ATRAS 3
+#define ESTRAT_DERECHA 2
+#define ESTRAT_IZQUIERDA 3
+#define ESTRAT_ATRAS 1
 #define ESTRAT_PID 4
 
 // Variables PID
-#define TIEMPO_PID 10
+#define VEL_BASE 150
+#define TIEMPO_PID 200
 #define KP 1.2
 #define KD 0.8
 #define KI 0
+
 int proporcional = 0;
 int derivada = 0;
 int posicion_anterior = 0;
 int correccion = 0;
 
-int vel = 150;
+int vel = 0;
 
 // Otras variables
 
 int estrategia = 0;
 float millisInicio = 0;
 int tiempoPulsado = 0;
-int pulsa = 0;
+long pulsa = 0;
+long parpadeo = 0;
+bool estado = false;
 bool inicio = false;
 long millisPID = 0;
 int contador = 0;
+bool usar_PID = 0;
 
 void setup() {
 
@@ -73,7 +78,18 @@ void loop() {
 
   if (boton()) {
     pulsa = millis();
+    parpadeo = millis();
     while (boton()) {
+      if ((millis() - pulsa) > 350) {
+        if ((millis() - parpadeo) > 100) {
+          parpadeo = millis();
+          estado = !estado;
+          digitalWrite(LED_ADELANTE, estado);
+          digitalWrite(LED_DERECHA, estado);
+          digitalWrite(LED_ATRAS, estado);
+          digitalWrite(LED_IZQUIERDA, estado);
+        }
+      }
     }
     tiempoPulsado = millis() - pulsa;
   } else {
@@ -85,30 +101,38 @@ void loop() {
       estrategia = (estrategia + 1) % NUM_ESTRATEGIAS;
       switch (estrategia) {
         case ESTRAT_ADELANTE:
+          vel = VEL_BASE + 100;
           digitalWrite(LED_ADELANTE, true);
           digitalWrite(LED_DERECHA, true);
           digitalWrite(LED_ATRAS, false);
           digitalWrite(LED_IZQUIERDA, true);
           break;
         case ESTRAT_DERECHA:
+          vel = 0;
+          correccion = 300;
           digitalWrite(LED_ADELANTE, true);
           digitalWrite(LED_DERECHA, true);
           digitalWrite(LED_ATRAS, true);
           digitalWrite(LED_IZQUIERDA, false);
           break;
         case ESTRAT_IZQUIERDA:
+          vel = 0;
+          correccion = -300;
           digitalWrite(LED_ADELANTE, true);
           digitalWrite(LED_DERECHA, false);
           digitalWrite(LED_ATRAS, true);
           digitalWrite(LED_IZQUIERDA, true);
           break;
         case ESTRAT_ATRAS:
+          vel = 0;
+          correccion = 300;
           digitalWrite(LED_ADELANTE, false);
           digitalWrite(LED_DERECHA, true);
           digitalWrite(LED_ATRAS, true);
           digitalWrite(LED_IZQUIERDA, true);
           break;
         case ESTRAT_PID:
+          vel = 0;
           digitalWrite(LED_ADELANTE, true);
           digitalWrite(LED_DERECHA, true);
           digitalWrite(LED_ATRAS, true);
@@ -126,30 +150,49 @@ void loop() {
 
   if (inicio && (millis() - millisInicio > 5000)) {
 
-    if (millis() >= millisPID + 1) {
+    if (!sensor_linea_D) {
+      secuencia_linea_D();
+      usar_PID = false;
+      vel = 0;
+    } else if (!sensor_linea_I) {
+      secuencia_linea_I();
+      usar_PID = false;
+      vel = 0;
+    }
+
+    if (sensor1() || sensor2() || sensor3() || sensor4()) {
+      usar_PID = true;
+      vel = VEL_BASE;
+    }
+
+    if (millis() >= millisPID + 1 && usar_PID) {
       filtro_sensores();
       contador = (contador + 1) % TIEMPO_PID; // Avanza el índice circularmente cuando supera TIEMPO_PID vuelve a ser 0
 
       if (contador == 0) { // Este if se ejecuta una vez cada tiempo establecido en TIEMPO_PID en ms
-        digitalWrite(LED_ADELANTE, false);
+        digitalWrite(LED_ADELANTE, true);
+        digitalWrite(LED_DERECHA, true);
+        digitalWrite(LED_ATRAS, true);
+        digitalWrite(LED_IZQUIERDA, true);
+        imprimir_sensores_raw();
         // imprimir_sensores_filtrados();
         // Serial.println(posicion_rival_chusta());
         // delay(100);
         //////////////////////////////
         ////    Calculo del PID   ////
         //////////////////////////////
+        if (usar_PID) {
+          proporcional = posicion_rival_chusta();
+          derivada = proporcional - posicion_anterior;
+          // integral = integral + (posicion / 10);
+          // integral= constrain(integral,-500,500);
 
-        proporcional = posicion_rival_chusta();
-        derivada = proporcional - posicion_anterior;
-        // integral = integral + (posicion / 10);
-        // integral= constrain(integral,-500,500);
-
-        correccion = ((KP * proporcional) + (KD * derivada)); // + (ki * integral));
-        // Serial.println(correccion);
-        posicion_anterior = proporcional;
-
+          correccion = ((KP * proporcional) + (KD * derivada)); // + (ki * integral));
+          // Serial.println(correccion);
+          posicion_anterior = proporcional;
+        }
         // aqui aplicamos la correccion del pid a las velocidades de los motores
-        asignacion_vel_motores();
+        // asignacion_vel_motores();
       }
       calculo_vel_motores(vel, correccion);
 
@@ -158,25 +201,25 @@ void loop() {
 
   } else if (inicio && (millis() - millisInicio > 4000)) {
 
-    digitalWrite(LED_ADELANTE, true);
+    digitalWrite(LED_ATRAS, false);
+    digitalWrite(LED_IZQUIERDA, true);
 
   } else if (inicio && (millis() - millisInicio > 3000)) {
 
-    digitalWrite(LED_ADELANTE, true);
-    digitalWrite(LED_IZQUIERDA, true);
+    digitalWrite(LED_DERECHA, false);
+    digitalWrite(LED_ATRAS, true);
 
   } else if (inicio && (millis() - millisInicio > 2000)) {
 
-    digitalWrite(LED_ADELANTE, true);
-    digitalWrite(LED_ATRAS, true);
-    digitalWrite(LED_IZQUIERDA, true);
+    digitalWrite(LED_ADELANTE, false);
+    digitalWrite(LED_DERECHA, true);
 
   } else if (inicio && (millis() - millisInicio > 1000)) {
 
     digitalWrite(LED_ADELANTE, true);
-    digitalWrite(LED_DERECHA, true);
-    digitalWrite(LED_ATRAS, true);
-    digitalWrite(LED_IZQUIERDA, true);
+    digitalWrite(LED_DERECHA, false);
+    digitalWrite(LED_ATRAS, false);
+    digitalWrite(LED_IZQUIERDA, false);
 
   } else {
     parar_motores();
