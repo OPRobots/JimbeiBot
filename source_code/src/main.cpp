@@ -33,8 +33,8 @@
 #define ESTRAT_PID 4
 
 // Variables PID
-#define VEL_BASE 150
-#define TIEMPO_PID 200
+#define VEL_BASE 170
+#define TIEMPO_PID 10
 #define KP 1.2
 #define KD 0.8
 #define KI 0
@@ -58,30 +58,94 @@ bool inicio = false;
 long millisPID = 0;
 int contador = 0;
 bool usar_PID = 0;
+bool debug = false;
 
 void setup() {
 
   inicializar_pines();
-  inicializar_motores();
+  if (boton()) {
+    debug = true;
+  } else {
+    inicializar_motores();
 
-  // Seteamos los leds en la estrategia 0 para que de el feedback nada mas arrancar
-  digitalWrite(LED_ADELANTE, true);
-  digitalWrite(LED_DERECHA, true);
-  digitalWrite(LED_ATRAS, false);
-  digitalWrite(LED_IZQUIERDA, true);
-
+    // Seteamos los leds en la estrategia 0 para que de el feedback nada mas arrancar
+    digitalWrite(LED_ADELANTE, true);
+    digitalWrite(LED_DERECHA, true);
+    digitalWrite(LED_ATRAS, false);
+    digitalWrite(LED_IZQUIERDA, true);
+  }
   Serial.begin(115200);
 }
 
 void loop() {
-  // imprimir_sensores_raw();
+
+  if (debug) {
+    if (boton()) {
+      estrategia = (estrategia + 1) % 3;
+      while (boton()) {
+      }
+    }
+    if (estrategia == 0) {
+      for (int i = 0; i < 20; i++) {
+        filtro_sensores();
+      }
+      if (sensor1()) {
+        digitalWrite(LED_IZQUIERDA, true);
+      } else {
+        digitalWrite(LED_IZQUIERDA, false);
+      }
+      if (sensor2()) {
+        digitalWrite(LED_ADELANTE, true);
+      } else {
+        digitalWrite(LED_ADELANTE, false);
+      }
+      if (sensor3()) {
+        digitalWrite(LED_ATRAS, true);
+      } else {
+        digitalWrite(LED_ATRAS, false);
+      }
+      if (sensor4()) {
+        digitalWrite(LED_DERECHA, true);
+      } else {
+        digitalWrite(LED_DERECHA, false);
+      }
+    }
+    if (estrategia == 1) {
+      if (!sensor_linea_D()) {
+        digitalWrite(LED_ADELANTE, true);
+        digitalWrite(LED_DERECHA, true);
+        digitalWrite(LED_ATRAS, true);
+        digitalWrite(LED_IZQUIERDA, false);
+      } else {
+        digitalWrite(LED_ADELANTE, false);
+        digitalWrite(LED_DERECHA, false);
+        digitalWrite(LED_ATRAS, false);
+        digitalWrite(LED_IZQUIERDA, false);
+      }
+      if (!sensor_linea_I()) {
+        digitalWrite(LED_ADELANTE, true);
+        digitalWrite(LED_DERECHA, false);
+        digitalWrite(LED_ATRAS, true);
+        digitalWrite(LED_IZQUIERDA, true);
+      } else {
+        digitalWrite(LED_ADELANTE, false);
+        digitalWrite(LED_DERECHA, false);
+        digitalWrite(LED_ATRAS, false);
+        digitalWrite(LED_IZQUIERDA, false);
+      }
+    }
+    if (estrategia == 2) {
+      imprimir_sensores_raw();
+    }
+    return;
+  }
 
   if (boton()) {
     pulsa = millis();
     parpadeo = millis();
     while (boton()) {
       if ((millis() - pulsa) > 350) {
-        if ((millis() - parpadeo) > 100) {
+        if ((millis() - parpadeo) > 75) {
           parpadeo = millis();
           estado = !estado;
           digitalWrite(LED_ADELANTE, estado);
@@ -150,23 +214,21 @@ void loop() {
 
   if (inicio && (millis() - millisInicio > 5000)) {
 
-    if (!sensor_linea_D) {
-      secuencia_linea_D();
-      usar_PID = false;
-      vel = 0;
-    } else if (!sensor_linea_I) {
-      secuencia_linea_I();
-      usar_PID = false;
-      vel = 0;
-    }
-
-    if (sensor1() || sensor2() || sensor3() || sensor4()) {
-      usar_PID = true;
-      vel = VEL_BASE;
-    }
-
-    if (millis() >= millisPID + 1 && usar_PID) {
+    if (millis() >= millisPID + 1) {
       filtro_sensores();
+
+      if (!sensor_linea_D()) {
+        secuencia_linea_D();
+        usar_PID = false;
+        vel = 0;
+      } else if (!sensor_linea_I()) {
+        secuencia_linea_I();
+        usar_PID = false;
+        vel = 0;
+      } else if (sensor1() || sensor2() || sensor3() || sensor4()) {
+        usar_PID = true;
+        vel = VEL_BASE;
+      }
       contador = (contador + 1) % TIEMPO_PID; // Avanza el índice circularmente cuando supera TIEMPO_PID vuelve a ser 0
 
       if (contador == 0) { // Este if se ejecuta una vez cada tiempo establecido en TIEMPO_PID en ms
@@ -174,13 +236,14 @@ void loop() {
         digitalWrite(LED_DERECHA, true);
         digitalWrite(LED_ATRAS, true);
         digitalWrite(LED_IZQUIERDA, true);
-        imprimir_sensores_raw();
+        // imprimir_sensores_raw();
         // imprimir_sensores_filtrados();
         // Serial.println(posicion_rival_chusta());
         // delay(100);
         //////////////////////////////
         ////    Calculo del PID   ////
         //////////////////////////////
+        // Serial.println(usar_PID);
         if (usar_PID) {
           proporcional = posicion_rival_chusta();
           derivada = proporcional - posicion_anterior;
@@ -192,7 +255,7 @@ void loop() {
           posicion_anterior = proporcional;
         }
         // aqui aplicamos la correccion del pid a las velocidades de los motores
-        // asignacion_vel_motores();
+        asignacion_vel_motores();
       }
       calculo_vel_motores(vel, correccion);
 

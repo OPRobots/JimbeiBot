@@ -1,6 +1,6 @@
 #include "sensores.h"
 
-const int MAGNITUD_FILTRO = 50;
+const int MAGNITUD_FILTRO = 20;
 const int UMBRAL = 2000;
 
 int posicion = 0;

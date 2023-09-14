@@ -14,7 +14,7 @@ void imprimir_sensores_raw() {
   Serial.print(digitalRead(S_LINEA_I));
   Serial.print(" ");
   Serial.println(digitalRead(S_LINEA_D));
-  delay(200);
+  delay(125);
 }
 
 void imprimir_sensores_filtrados() {

@@ -111,6 +111,10 @@ void secuencia_linea_D(){
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
   delay(200);
+  Vel_D = 0;
+  Vel_I = 0;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
 }
 void secuencia_linea_I(){
   Vel_D = 0;
@@ -128,4 +132,8 @@ void secuencia_linea_I(){
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
   delay(200);
+  Vel_D = 0;
+  Vel_I = 0;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
 }
