@@ -1,7 +1,8 @@
 #include "sensores.h"
 
 const int MAGNITUD_FILTRO = 20;
-const int UMBRAL = 2000;
+const int UMBRAL = 1500;
+const int UMBRAL_HISTERESIS = 1000;
 
 int posicion = 0;
 
@@ -9,6 +10,11 @@ int s_rival_1 = 0;
 int s_rival_2 = 0;
 int s_rival_3 = 0;
 int s_rival_4 = 0;
+
+bool s_rival_1_bool = false;
+bool s_rival_2_bool = false;
+bool s_rival_3_bool = false;
+bool s_rival_4_bool = false;
 
 int Filtro_s1[MAGNITUD_FILTRO];
 int Filtro_s2[MAGNITUD_FILTRO];
@@ -36,19 +42,53 @@ void filtro_sensores() {
   s_rival_2 = s_rival_2 / MAGNITUD_FILTRO;
   s_rival_3 = s_rival_3 / MAGNITUD_FILTRO;
   s_rival_4 = s_rival_4 / MAGNITUD_FILTRO;
+
+  s_rival_1_bool = s_rival_1 > UMBRAL;
+  s_rival_2_bool = s_rival_2 > UMBRAL;
+  s_rival_3_bool = s_rival_3 > UMBRAL;
+  s_rival_4_bool = s_rival_4 > UMBRAL;
+}
+
+void filtro_sensores_histeresis() {
+
+  s_rival_1 = analogRead(S_RIVAL_1);
+  s_rival_2 = analogRead(S_RIVAL_2);
+  s_rival_3 = analogRead(S_RIVAL_3);
+  s_rival_4 = analogRead(S_RIVAL_4);
+
+  if (s_rival_1 > UMBRAL) {
+    s_rival_1_bool = true;
+  } else if (s_rival_1 < UMBRAL_HISTERESIS) {
+    s_rival_1_bool = false;
+  }
+  if (s_rival_2 > UMBRAL) {
+    s_rival_2_bool = true;
+  } else if (s_rival_2 < UMBRAL_HISTERESIS) {
+    s_rival_2_bool = false;
+  }
+  if (s_rival_3 > UMBRAL) {
+    s_rival_3_bool = true;
+  } else if (s_rival_3 < UMBRAL_HISTERESIS) {
+    s_rival_3_bool = false;
+  }
+  if (s_rival_4 > UMBRAL) {
+    s_rival_4_bool = true;
+  } else if (s_rival_4 < UMBRAL_HISTERESIS) {
+    s_rival_4_bool = false;
+  }
 }
 
 bool sensor1() {
-  return s_rival_1 > UMBRAL;
+  return s_rival_1_bool;
 }
 bool sensor2() {
-  return s_rival_2 > UMBRAL;
+  return s_rival_2_bool;
 }
 bool sensor3() {
-  return s_rival_3 > UMBRAL;
+  return s_rival_3_bool;
 }
 bool sensor4() {
-  return s_rival_4 > UMBRAL;
+  return s_rival_4_bool;
 }
 
 int sensor1_analog() {

@@ -4,6 +4,7 @@
 #include "pines.h"
 
 void filtro_sensores();
+void filtro_sensores_histeresis();
 bool sensor1();
 bool sensor2();
 bool sensor3();

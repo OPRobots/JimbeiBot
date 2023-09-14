@@ -89,7 +89,7 @@ void loop() {
     }
     if (estrategia == 0) {
       for (int i = 0; i < 20; i++) {
-        filtro_sensores();
+        filtro_sensores_histeresis();
       }
       if (sensor1()) {
         digitalWrite(LED_IZQUIERDA, true);
