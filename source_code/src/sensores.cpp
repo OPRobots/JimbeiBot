@@ -1,8 +1,8 @@
 #include "sensores.h"
 
 const int MAGNITUD_FILTRO = 20;
-const int UMBRAL = 1500;
-const int UMBRAL_HISTERESIS = 1000;
+const int UMBRAL = 2000;
+const int UMBRAL_HISTERESIS = 1500;
 
 int posicion = 0;
 

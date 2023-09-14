@@ -7,9 +7,6 @@ const int MAGNITUD_FILTRO = 20;
 int Mot_D = 0;
 int Mot_I = 1;
 
-int aux_Vel_D = 0;
-int aux_Vel_I = 0;
-
 int Vel_D = 0;
 int Vel_I = 0;
 
@@ -30,21 +27,24 @@ void inicializar_motores() {
 
 void calculo_vel_motores(int vel, int correccion) {
 
+  int aux_Vel_D = 0;
+  int aux_Vel_I = 0;
+
   Vel_D = vel - correccion;
   Vel_I = vel + correccion;
-/*
-  Filtro_MD[i_m] = aux_Vel_D;
-  Filtro_MI[i_m] = aux_Vel_I;
-  i_m = (i_m + 1) % MAGNITUD_FILTRO; // Avanza el índice circularmente cuando supera MAGNITUD FILTRO vuelve a ser 0
+  /*
+    Filtro_MD[i_m] = Vel_D;
+    Filtro_MI[i_m] = Vel_I;
+    i_m = (i_m + 1) % MAGNITUD_FILTRO; // Avanza el índice circularmente cuando supera MAGNITUD FILTRO vuelve a ser 0
 
-  for (int i = 0; i < MAGNITUD_FILTRO; i++) {
-    aux_Vel_D += Filtro_MD[i];
-    aux_Vel_I += Filtro_MI[i];
-  }
+    for (int i = 0; i < MAGNITUD_FILTRO; i++) {
+      aux_Vel_D += Filtro_MD[i];
+      aux_Vel_I += Filtro_MI[i];
+    }
 
-  Vel_D = aux_Vel_D / MAGNITUD_FILTRO;
-  Vel_I = aux_Vel_I / MAGNITUD_FILTRO;
-  */
+    Vel_D = aux_Vel_D / MAGNITUD_FILTRO;
+    Vel_I = aux_Vel_I / MAGNITUD_FILTRO;
+    */
 }
 
 void asignacion_vel_motores() {
@@ -82,9 +82,9 @@ void asignacion_vel_motores() {
   // Serial.print(map(Vel_D, -1000, 1000, 1024, 2048));
   // Serial.print(" ");
   // Serial.println(map(Vel_I, -1000, 1000, 1024, 2048));
-  // Serial.print(Vel_D);
-  // Serial.print(" ");
-  // Serial.println(Vel_I);
+  Serial.print(Vel_D);
+  Serial.print(" ");
+  Serial.println(Vel_I);
   // delay(100);
 }
 void parar_motores() {
@@ -95,12 +95,12 @@ void parar_motores() {
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
 }
 
-void secuencia_linea_D(){
+void secuencia_linea_D() {
   Vel_D = 0;
   Vel_I = 0;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  delay (50);
+  delay(50);
   Vel_D = -350;
   Vel_I = -350;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
@@ -116,12 +116,12 @@ void secuencia_linea_D(){
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
 }
-void secuencia_linea_I(){
+void secuencia_linea_I() {
   Vel_D = 0;
   Vel_I = 0;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  delay (50);
+  delay(50);
   Vel_D = -500;
   Vel_I = -500;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));

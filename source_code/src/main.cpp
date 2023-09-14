@@ -33,13 +33,13 @@
 #define ESTRAT_PID 4
 
 // Variables PID
-#define VEL_BASE 170
+#define VEL_BASE 150
 #define TIEMPO_PID 10
 #define KP 1.2
 #define KD 0.8
 #define KI 0
 
-#define COLOR 1 // 1 = NEGRO / 0 = BLANCO (BLANCO PARA COMPETIR, NEGRO PARA PRUEBAS SIN DOYHO)
+#define ANULAR_LINEA 0 // 1 = ANULADO / 0 = NO ANULDO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
 
 int proporcional = 0;
 int derivada = 0;
@@ -67,6 +67,8 @@ void setup() {
   inicializar_pines();
   if (boton()) {
     debug = true;
+    while (boton()) {
+    }
   } else {
     inicializar_motores();
 
@@ -217,19 +219,21 @@ void loop() {
   if (inicio && (millis() - millisInicio > 5000)) {
 
     if (millis() >= millisPID + 1) {
-      filtro_sensores();
+      filtro_sensores_histeresis();
 
-      if (sensor_linea_D() == COLOR) {
+      if (!sensor_linea_D() && ANULAR_LINEA) {
         secuencia_linea_D();
         usar_PID = false;
         vel = 0;
-      } else if (sensor_linea_I() == COLOR) {
+      } else if (!sensor_linea_I() && ANULAR_LINEA) {
         secuencia_linea_I();
         usar_PID = false;
         vel = 0;
       } else if (sensor1() || sensor2() || sensor3() || sensor4()) {
         usar_PID = true;
+        if(!(sensor1() && sensor4())){
         vel = VEL_BASE;
+        }
       }
       contador = (contador + 1) % TIEMPO_PID; // Avanza el índice circularmente cuando supera TIEMPO_PID vuelve a ser 0
 
@@ -251,7 +255,7 @@ void loop() {
           derivada = proporcional - posicion_anterior;
 
           if (proporcional == 0) {
-            vel += 5;
+            vel += 1;
           } else if (proporcional > 75) {
             vel = VEL_BASE;
           }
