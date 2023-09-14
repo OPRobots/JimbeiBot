@@ -39,7 +39,7 @@
 #define KD 0.8
 #define KI 0
 
-#define COLOR 1 //1 = NEGRO / 0 = BLANCO (BLANCO PARA COMPETIR, NEGRO PARA PRUEBAS SIN DOYHO)
+#define COLOR 1 // 1 = NEGRO / 0 = BLANCO (BLANCO PARA COMPETIR, NEGRO PARA PRUEBAS SIN DOYHO)
 
 int proporcional = 0;
 int derivada = 0;
@@ -249,8 +249,12 @@ void loop() {
         if (usar_PID) {
           proporcional = posicion_rival_chusta();
           derivada = proporcional - posicion_anterior;
-          // integral = integral + (posicion / 10);
-          // integral= constrain(integral,-500,500);
+
+          if (proporcional == 0) {
+            vel += 5;
+          } else if (proporcional > 75) {
+            vel = VEL_BASE;
+          }
 
           correccion = ((KP * proporcional) + (KD * derivada)); // + (ki * integral));
           // Serial.println(correccion);
