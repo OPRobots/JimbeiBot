@@ -39,6 +39,8 @@
 #define KD 0.8
 #define KI 0
 
+#define COLOR 1 //1 = NEGRO / 0 = BLANCO (BLANCO PARA COMPETIR, NEGRO PARA PRUEBAS SIN DOYHO)
+
 int proporcional = 0;
 int derivada = 0;
 int posicion_anterior = 0;
@@ -217,11 +219,11 @@ void loop() {
     if (millis() >= millisPID + 1) {
       filtro_sensores();
 
-      if (!sensor_linea_D()) {
+      if (sensor_linea_D() == COLOR) {
         secuencia_linea_D();
         usar_PID = false;
         vel = 0;
-      } else if (!sensor_linea_I()) {
+      } else if (sensor_linea_I() == COLOR) {
         secuencia_linea_I();
         usar_PID = false;
         vel = 0;
