@@ -4,26 +4,6 @@
 #include "sensores.h"
 #include <Arduino.h>
 
-// PINES
-
-// #define S_RIVAL_1 2
-// #define S_RIVAL_2 4
-// #define S_RIVAL_3 0
-// #define S_RIVAL_4 1
-
-// #define S_LINEA_I 3
-// #define S_LINEA_D 21
-
-// #define PWM_MD 6
-// #define PWM_MI 9
-
-// #define LED_ADELANTE 20
-// #define LED_ATRAS 8
-// #define LED_DERECHA 7
-// #define LED_IZQUIERDA 10
-
-// #define BOTON 5
-
 #define NUM_ESTRATEGIAS 5
 
 #define ESTRAT_ADELANTE 0
@@ -97,10 +77,14 @@ void loop() {
         secuencia_linea_D();
         usar_PID = false;
         vel = 0;
+        correccion = 0;
+        posicion_anterior = 0;
       } else if (sensor_linea_I() && ANULAR_LINEA) {
         secuencia_linea_I();
         usar_PID = false;
         vel = 0;
+        correccion = 0;
+        posicion_anterior = 0;
       } else if (sensor1() || sensor2() || sensor3() || sensor4()) {
         usar_PID = true;
         if (!(sensor1() && sensor4())) {
