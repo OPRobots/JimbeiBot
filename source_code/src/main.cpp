@@ -36,7 +36,7 @@
 #define VEL_BASE 150
 #define TIEMPO_PID 10
 #define KP 1.2
-#define KD 0.8
+#define KD 2
 #define KI 0
 
 #define ANULAR_LINEA 1 // 0 = ANULADO / 1 = NO ANULDO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
@@ -126,7 +126,7 @@ void loop() {
           proporcional = posicion_rival_chusta();
           derivada = proporcional - posicion_anterior;
 
-          if (proporcional == 0) {
+          if (proporcional == 0 && estrategia != ESTRAT_PID) {
             vel += 1;
           } else if (proporcional > 75) {
             vel = VEL_BASE;
@@ -194,7 +194,7 @@ void loop() {
         estrategia = (estrategia + 1) % NUM_ESTRATEGIAS;
         switch (estrategia) {
           case ESTRAT_ADELANTE:
-            vel = VEL_BASE + 100;
+            vel = VEL_BASE + 65;
             digitalWrite(LED_ADELANTE, true);
             digitalWrite(LED_DERECHA, true);
             digitalWrite(LED_ATRAS, false);
