@@ -1,5 +1,67 @@
 #include "debug.h"
 
+#define MODOS_DEBUG 3
+int modo_debug = 0;
+
+void debug_inicio(){
+  if (boton()) {
+      modo_debug = (modo_debug + 1) % MODOS_DEBUG;
+      while (boton()) {
+      }
+    }
+    if (modo_debug == 0) {
+      for (int i = 0; i < 20; i++) {
+        filtro_sensores();
+      }
+      if (sensor1()) {
+        digitalWrite(LED_IZQUIERDA, true);
+      } else {
+        digitalWrite(LED_IZQUIERDA, false);
+      }
+      if (sensor2()) {
+        digitalWrite(LED_ADELANTE, true);
+      } else {
+        digitalWrite(LED_ADELANTE, false);
+      }
+      if (sensor3()) {
+        digitalWrite(LED_ATRAS, true);
+      } else {
+        digitalWrite(LED_ATRAS, false);
+      }
+      if (sensor4()) {
+        digitalWrite(LED_DERECHA, true);
+      } else {
+        digitalWrite(LED_DERECHA, false);
+      }
+    }
+    if (modo_debug == 1) {
+      if (!sensor_linea_D()) {
+        digitalWrite(LED_ADELANTE, true);
+        digitalWrite(LED_DERECHA, true);
+        digitalWrite(LED_ATRAS, true);
+        digitalWrite(LED_IZQUIERDA, false);
+      } else {
+        digitalWrite(LED_ADELANTE, false);
+        digitalWrite(LED_DERECHA, false);
+        digitalWrite(LED_ATRAS, false);
+        digitalWrite(LED_IZQUIERDA, false);
+      }
+      if (!sensor_linea_I()) {
+        digitalWrite(LED_ADELANTE, true);
+        digitalWrite(LED_DERECHA, false);
+        digitalWrite(LED_ATRAS, true);
+        digitalWrite(LED_IZQUIERDA, true);
+      } else {
+        digitalWrite(LED_ADELANTE, false);
+        digitalWrite(LED_DERECHA, false);
+        digitalWrite(LED_ATRAS, false);
+        digitalWrite(LED_IZQUIERDA, false);
+      }
+    }
+    if (modo_debug == 2) {
+      imprimir_sensores_raw();
+    }
+}
 
 void imprimir_sensores_raw() {
   Serial.print(analogRead(S_RIVAL_1));

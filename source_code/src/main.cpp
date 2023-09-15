@@ -39,7 +39,7 @@
 #define KD 0.8
 #define KI 0
 
-#define ANULAR_LINEA 0 // 1 = ANULADO / 0 = NO ANULDO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
+#define ANULAR_LINEA 1 // 0 = ANULADO / 1 = NO ANULDO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
 
 int proporcional = 0;
 int derivada = 0;
@@ -84,155 +84,27 @@ void setup() {
 void loop() {
 
   if (debug) {
-    if (boton()) {
-      estrategia = (estrategia + 1) % 3;
-      while (boton()) {
-      }
-    }
-    if (estrategia == 0) {
-      for (int i = 0; i < 20; i++) {
-        filtro_sensores_histeresis();
-      }
-      if (sensor1()) {
-        digitalWrite(LED_IZQUIERDA, true);
-      } else {
-        digitalWrite(LED_IZQUIERDA, false);
-      }
-      if (sensor2()) {
-        digitalWrite(LED_ADELANTE, true);
-      } else {
-        digitalWrite(LED_ADELANTE, false);
-      }
-      if (sensor3()) {
-        digitalWrite(LED_ATRAS, true);
-      } else {
-        digitalWrite(LED_ATRAS, false);
-      }
-      if (sensor4()) {
-        digitalWrite(LED_DERECHA, true);
-      } else {
-        digitalWrite(LED_DERECHA, false);
-      }
-    }
-    if (estrategia == 1) {
-      if (!sensor_linea_D()) {
-        digitalWrite(LED_ADELANTE, true);
-        digitalWrite(LED_DERECHA, true);
-        digitalWrite(LED_ATRAS, true);
-        digitalWrite(LED_IZQUIERDA, false);
-      } else {
-        digitalWrite(LED_ADELANTE, false);
-        digitalWrite(LED_DERECHA, false);
-        digitalWrite(LED_ATRAS, false);
-        digitalWrite(LED_IZQUIERDA, false);
-      }
-      if (!sensor_linea_I()) {
-        digitalWrite(LED_ADELANTE, true);
-        digitalWrite(LED_DERECHA, false);
-        digitalWrite(LED_ATRAS, true);
-        digitalWrite(LED_IZQUIERDA, true);
-      } else {
-        digitalWrite(LED_ADELANTE, false);
-        digitalWrite(LED_DERECHA, false);
-        digitalWrite(LED_ATRAS, false);
-        digitalWrite(LED_IZQUIERDA, false);
-      }
-    }
-    if (estrategia == 2) {
-      imprimir_sensores_raw();
-    }
+    debug_inicio();
     return;
-  }
-
-  if (boton()) {
-    pulsa = millis();
-    parpadeo = millis();
-    while (boton()) {
-      if ((millis() - pulsa) > 350) {
-        if ((millis() - parpadeo) > 75) {
-          parpadeo = millis();
-          estado = !estado;
-          digitalWrite(LED_ADELANTE, estado);
-          digitalWrite(LED_DERECHA, estado);
-          digitalWrite(LED_ATRAS, estado);
-          digitalWrite(LED_IZQUIERDA, estado);
-        }
-      }
-    }
-    tiempoPulsado = millis() - pulsa;
-  } else {
-    tiempoPulsado = 0;
-  }
-
-  if (tiempoPulsado > 0) {
-    if (tiempoPulsado < 350) {
-      estrategia = (estrategia + 1) % NUM_ESTRATEGIAS;
-      switch (estrategia) {
-        case ESTRAT_ADELANTE:
-          vel = VEL_BASE + 100;
-          digitalWrite(LED_ADELANTE, true);
-          digitalWrite(LED_DERECHA, true);
-          digitalWrite(LED_ATRAS, false);
-          digitalWrite(LED_IZQUIERDA, true);
-          break;
-        case ESTRAT_DERECHA:
-          vel = 0;
-          correccion = 300;
-          digitalWrite(LED_ADELANTE, true);
-          digitalWrite(LED_DERECHA, true);
-          digitalWrite(LED_ATRAS, true);
-          digitalWrite(LED_IZQUIERDA, false);
-          break;
-        case ESTRAT_IZQUIERDA:
-          vel = 0;
-          correccion = -300;
-          digitalWrite(LED_ADELANTE, true);
-          digitalWrite(LED_DERECHA, false);
-          digitalWrite(LED_ATRAS, true);
-          digitalWrite(LED_IZQUIERDA, true);
-          break;
-        case ESTRAT_ATRAS:
-          vel = 0;
-          correccion = 300;
-          digitalWrite(LED_ADELANTE, false);
-          digitalWrite(LED_DERECHA, true);
-          digitalWrite(LED_ATRAS, true);
-          digitalWrite(LED_IZQUIERDA, true);
-          break;
-        case ESTRAT_PID:
-          vel = 0;
-          digitalWrite(LED_ADELANTE, true);
-          digitalWrite(LED_DERECHA, true);
-          digitalWrite(LED_ATRAS, true);
-          digitalWrite(LED_IZQUIERDA, true);
-          break;
-
-        default:
-          break;
-      }
-    } else {
-      inicio = true;
-      millisInicio = millis();
-    }
   }
 
   if (inicio && (millis() - millisInicio > 5000)) {
 
     if (millis() >= millisPID + 1) {
-      filtro_sensores_histeresis();
+      filtro_sensores();
 
-      if (!sensor_linea_D() && ANULAR_LINEA) {
+      if (sensor_linea_D() && ANULAR_LINEA) {
         secuencia_linea_D();
         usar_PID = false;
         vel = 0;
-      } else if (!sensor_linea_I() && ANULAR_LINEA) {
+      } else if (sensor_linea_I() && ANULAR_LINEA) {
         secuencia_linea_I();
         usar_PID = false;
         vel = 0;
       } else if (sensor1() || sensor2() || sensor3() || sensor4()) {
         usar_PID = true;
-        if(!(sensor1() && sensor4())){
-        vel = VEL_BASE;
+        if (!(sensor1() && sensor4())) {
+          vel = VEL_BASE;
         }
       }
       contador = (contador + 1) % TIEMPO_PID; // Avanza el índice circularmente cuando supera TIEMPO_PID vuelve a ser 0
@@ -296,5 +168,77 @@ void loop() {
 
   } else {
     parar_motores();
+
+    if (boton()) {
+      pulsa = millis();
+      parpadeo = millis();
+      while (boton()) {
+        if ((millis() - pulsa) > 350) {
+          if ((millis() - parpadeo) > 75) {
+            parpadeo = millis();
+            estado = !estado;
+            digitalWrite(LED_ADELANTE, estado);
+            digitalWrite(LED_DERECHA, estado);
+            digitalWrite(LED_ATRAS, estado);
+            digitalWrite(LED_IZQUIERDA, estado);
+          }
+        }
+      }
+      tiempoPulsado = millis() - pulsa;
+    } else {
+      tiempoPulsado = 0;
+    }
+
+    if (tiempoPulsado > 0) {
+      if (tiempoPulsado < 350) {
+        estrategia = (estrategia + 1) % NUM_ESTRATEGIAS;
+        switch (estrategia) {
+          case ESTRAT_ADELANTE:
+            vel = VEL_BASE + 100;
+            digitalWrite(LED_ADELANTE, true);
+            digitalWrite(LED_DERECHA, true);
+            digitalWrite(LED_ATRAS, false);
+            digitalWrite(LED_IZQUIERDA, true);
+            break;
+          case ESTRAT_DERECHA:
+            vel = 0;
+            correccion = 300;
+            digitalWrite(LED_ADELANTE, true);
+            digitalWrite(LED_DERECHA, true);
+            digitalWrite(LED_ATRAS, true);
+            digitalWrite(LED_IZQUIERDA, false);
+            break;
+          case ESTRAT_IZQUIERDA:
+            vel = 0;
+            correccion = -300;
+            digitalWrite(LED_ADELANTE, true);
+            digitalWrite(LED_DERECHA, false);
+            digitalWrite(LED_ATRAS, true);
+            digitalWrite(LED_IZQUIERDA, true);
+            break;
+          case ESTRAT_ATRAS:
+            vel = 0;
+            correccion = 300;
+            digitalWrite(LED_ADELANTE, false);
+            digitalWrite(LED_DERECHA, true);
+            digitalWrite(LED_ATRAS, true);
+            digitalWrite(LED_IZQUIERDA, true);
+            break;
+          case ESTRAT_PID:
+            vel = 0;
+            digitalWrite(LED_ADELANTE, true);
+            digitalWrite(LED_DERECHA, true);
+            digitalWrite(LED_ATRAS, true);
+            digitalWrite(LED_IZQUIERDA, true);
+            break;
+
+          default:
+            break;
+        }
+      } else {
+        inicio = true;
+        millisInicio = millis();
+      }
+    }
   }
 }

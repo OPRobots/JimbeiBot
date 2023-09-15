@@ -42,19 +42,19 @@ void filtro_sensores() {
   s_rival_2 = s_rival_2 / MAGNITUD_FILTRO;
   s_rival_3 = s_rival_3 / MAGNITUD_FILTRO;
   s_rival_4 = s_rival_4 / MAGNITUD_FILTRO;
-
-  s_rival_1_bool = s_rival_1 > UMBRAL;
-  s_rival_2_bool = s_rival_2 > UMBRAL;
-  s_rival_3_bool = s_rival_3 > UMBRAL;
-  s_rival_4_bool = s_rival_4 > UMBRAL;
+  filtro_sensores_histeresis();
+  // s_rival_1_bool = s_rival_1 > UMBRAL;
+  // s_rival_2_bool = s_rival_2 > UMBRAL;
+  // s_rival_3_bool = s_rival_3 > UMBRAL;
+  // s_rival_4_bool = s_rival_4 > UMBRAL;
 }
 
 void filtro_sensores_histeresis() {
 
-  s_rival_1 = analogRead(S_RIVAL_1);
-  s_rival_2 = analogRead(S_RIVAL_2);
-  s_rival_3 = analogRead(S_RIVAL_3);
-  s_rival_4 = analogRead(S_RIVAL_4);
+  // s_rival_1 = analogRead(S_RIVAL_1);
+  // s_rival_2 = analogRead(S_RIVAL_2);
+  // s_rival_3 = analogRead(S_RIVAL_3);
+  // s_rival_4 = analogRead(S_RIVAL_4);
 
   if (s_rival_1 > UMBRAL) {
     s_rival_1_bool = true;

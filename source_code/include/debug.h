@@ -4,6 +4,7 @@
 #include "pines.h"
 #include "sensores.h"
 
+void debug_inicio();
 void imprimir_sensores_raw();
 void imprimir_sensores_filtrados();
 void imprimir_sensores_filtrados_analog();
