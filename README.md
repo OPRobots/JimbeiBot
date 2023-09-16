@@ -2,7 +2,7 @@
 
 Robot minisumo con ESP32 C3 super mini, motores Brushless de medio caballo de poder y sensores SHARP.
 
-![JimbeiBot](.images/photo1694700997%20(1).jpeg "JimbeiBot")
+![JimbeiBot](./images/photo1694700997%20(1).jpeg "JimbeiBot")
 
 ## Hardware
 - ESP32 C3 super mini
