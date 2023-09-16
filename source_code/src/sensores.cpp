@@ -1,10 +1,17 @@
 #include "sensores.h"
 
 const int MAGNITUD_FILTRO = 20;
-const int UMBRAL = 2000;
-const int UMBRAL_HISTERESIS = 1500;
+const int UMBRAL = 1700;
+const int UMBRAL_HISTERESIS = 1000;
+const int CONTADOR_LINEA = 6;
 
 int posicion = 0;
+
+bool rival_encima = false;
+
+int contador_boton = 0;
+int contador_linea_D = 0;
+int contador_linea_I = 0;
 
 int s_rival_1 = 0;
 int s_rival_2 = 0;
@@ -42,6 +49,7 @@ void filtro_sensores() {
   s_rival_2 = s_rival_2 / MAGNITUD_FILTRO;
   s_rival_3 = s_rival_3 / MAGNITUD_FILTRO;
   s_rival_4 = s_rival_4 / MAGNITUD_FILTRO;
+
   filtro_sensores_histeresis();
   // s_rival_1_bool = s_rival_1 > UMBRAL;
   // s_rival_2_bool = s_rival_2 > UMBRAL;
@@ -76,6 +84,15 @@ void filtro_sensores_histeresis() {
   } else if (s_rival_4 < UMBRAL_HISTERESIS) {
     s_rival_4_bool = false;
   }
+
+  // Filtro para intentar evitar la perdida de deteccion cuando el robot rival esta mas cerca de 4cm (limite de los sensores)
+  if (!s_rival_1_bool && !s_rival_2_bool && !s_rival_3_bool && !s_rival_4_bool) {
+    rival_encima = false;
+  } else if ((s_rival_1 > 3000 && s_rival_4 > 3000) || rival_encima) {
+    s_rival_1_bool = true;
+    s_rival_4_bool = true;
+    rival_encima = true;
+  }
 }
 
 bool sensor1() {
@@ -105,13 +122,40 @@ int sensor4_analog() {
 }
 
 bool sensor_linea_I() {
-  return digitalRead(S_LINEA_I);
+  if (!digitalRead(S_LINEA_I)) {
+    contador_linea_I++;
+  } else {
+    contador_linea_I = 0;
+  }
+  if (contador_linea_I >= CONTADOR_LINEA) {
+    return false;
+  } else {
+    return true;
+  }
 }
 bool sensor_linea_D() {
-  return digitalRead(S_LINEA_D);
+  if (!digitalRead(S_LINEA_D)) {
+    contador_linea_D++;
+  } else {
+    contador_linea_D = 0;
+  }
+  if (contador_linea_D >= CONTADOR_LINEA) {
+    return false;
+  } else {
+    return true;
+  }
 }
 bool boton() {
-  return !digitalRead(BOTON);
+  if (!digitalRead(BOTON)) {
+    contador_boton++;
+  } else {
+    contador_boton = 0;
+  }
+  if (contador_boton >= CONTADOR_LINEA) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 int posicion_rival_chusta() {
@@ -139,6 +183,7 @@ int posicion_rival_chusta() {
   return posicion;
 }
 
+// No se usa actualmente
 int posicion_rival() {
   int sumaSensoresPonderados = 0;
   int sumaSensores = 0;
