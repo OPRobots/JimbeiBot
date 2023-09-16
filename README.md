@@ -2,7 +2,7 @@
 
 Robot minisumo con ESP32 C3 super mini, motores Brushless de medio caballo de poder y sensores SHARP.
 
-![JimbeiBot](./images/JimbeiBot_finish.png "JimbeiBot")
+![JimbeiBot](./images/photo1694700997%20(1).jpeg "JimbeiBot")
 
 ## Hardware
 - ESP32 C3 super mini
@@ -14,7 +14,9 @@ Robot minisumo con ESP32 C3 super mini, motores Brushless de medio caballo de po
 - Goma de ruedas hecha a medida con Uretano/Vitaflex20
 - Chasis completamente impreso en PLA
 - Pletina de cobre para aumentar peso
-![JimbeiBot Chasis](./images/JimbeiBot_3d_model.png "JimbeiBot - Chasis")
+![JimbeiBot Chasis](./images/photo1694700997.jpeg "JimbeiBot - Chasis")
+
+![JimbeiBot Chasis](./images/photo1694700997%20(2).jpeg "JimbeiBot - Chasis")
 
 ## Software
 - Programado con Visual Estudio Code con Arduino
