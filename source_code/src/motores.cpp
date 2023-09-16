@@ -1,6 +1,6 @@
 #include "motores.h"
 
-#define UMBRAL_COGGIN 120
+#define UMBRAL_COGGIN 110
 
 const int MAGNITUD_FILTRO = 30;
 
@@ -33,7 +33,7 @@ void calculo_vel_motores(int vel, int correccion) {
   int aux_Vel_D = 0;
   int aux_Vel_I = 0;
 
-  if (vel == 0) {
+  if (vel == 0 && correccion == 0) {
     Vel_D = 0;
     Vel_I = 0;
     ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
@@ -139,16 +139,16 @@ void secuencia_linea_I() {
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
   delay(50);
-  Vel_D = -250;
-  Vel_I = -250;
+  Vel_D = -200;
+  Vel_I = -200;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
   delay(150);
-  Vel_D = -200;
-  Vel_I = 200;
+  Vel_D = -180;
+  Vel_I = 180;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  delay(300);
+  delay(200);
   Vel_D = 0;
   Vel_I = 0;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));

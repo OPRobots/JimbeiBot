@@ -16,7 +16,7 @@
 #define VEL_BASE 150
 #define TIEMPO_PID 10
 #define KP 1.2
-#define KD 2
+#define KD 0.8
 #define KI 0
 
 #define ANULAR_LINEA 1 // 0 = ANULADO / 1 = NO ANULDO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
@@ -45,9 +45,9 @@ bool debug = false;
 void setup() {
 
   inicializar_pines();
-  if (boton()) {
+  if (!digitalRead(BOTON)) {
     debug = true;
-    while (boton()) {
+    while (!digitalRead(BOTON)) {
     }
   } else {
     inicializar_motores();
@@ -73,15 +73,15 @@ void loop() {
     if (millis() >= millisPID + 1) {
       filtro_sensores();
 
-      if (sensor_linea_D() && ANULAR_LINEA) {
+      if (!sensor_linea_D() && ANULAR_LINEA) {
         secuencia_linea_D();
-        usar_PID = false;
+        usar_PID = true;
         vel = 0;
         correccion = 0;
         posicion_anterior = 0;
-      } else if (sensor_linea_I() && ANULAR_LINEA) {
+      } else if (!sensor_linea_I() && ANULAR_LINEA) {
         secuencia_linea_I();
-        usar_PID = false;
+        usar_PID = true;
         vel = 0;
         correccion = 0;
         posicion_anterior = 0;
@@ -110,8 +110,8 @@ void loop() {
           proporcional = posicion_rival_chusta();
           derivada = proporcional - posicion_anterior;
 
-          if (proporcional == 0 && estrategia != ESTRAT_PID) {
-            vel += 1;
+          if (proporcional == 0) {
+            vel += 2;
           } else if (proporcional > 75) {
             vel = VEL_BASE;
           }
@@ -121,6 +121,9 @@ void loop() {
           posicion_anterior = proporcional;
         }
         // aqui aplicamos la correccion del pid a las velocidades de los motores
+        if (estrategia == ESTRAT_PID){
+          vel = 0;
+        }
         asignacion_vel_motores();
       }
       calculo_vel_motores(vel, correccion);
@@ -186,7 +189,7 @@ void loop() {
             break;
           case ESTRAT_DERECHA:
             vel = 0;
-            correccion = 300;
+            correccion = 180;
             digitalWrite(LED_ADELANTE, true);
             digitalWrite(LED_DERECHA, true);
             digitalWrite(LED_ATRAS, true);
@@ -194,7 +197,7 @@ void loop() {
             break;
           case ESTRAT_IZQUIERDA:
             vel = 0;
-            correccion = -300;
+            correccion = -180;
             digitalWrite(LED_ADELANTE, true);
             digitalWrite(LED_DERECHA, false);
             digitalWrite(LED_ATRAS, true);
@@ -202,7 +205,7 @@ void loop() {
             break;
           case ESTRAT_ATRAS:
             vel = 0;
-            correccion = 300;
+            correccion = 280;
             digitalWrite(LED_ADELANTE, false);
             digitalWrite(LED_DERECHA, true);
             digitalWrite(LED_ATRAS, true);
