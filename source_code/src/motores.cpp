@@ -19,7 +19,9 @@ int Filtro_MI[MAGNITUD_FILTRO];
 int i_m = 0;
 
 void inicializar_motores() {
-  ledcSetup(0, 4000, 11); // Canal de PWM (0 - 16),Frecuencia, Resolucion (nº bits)
+  ledcSetup(Mot_D, 4000, 11); // Canal de PWM (0 - 16),Frecuencia, Resolucion (nº bits)
+  ledcSetup(Mot_I, 4000, 11); // Canal de PWM (0 - 16),Frecuencia, Resolucion (nº bits)
+
   ledcAttachPin(PWM_MD, Mot_D);
   ledcAttachPin(PWM_MI, Mot_I);
 
