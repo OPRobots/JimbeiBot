@@ -5,23 +5,20 @@
 // PINES
 // Sensores numerados por orden de colocación en el robot mirandolo desde arriba con la cuchilla hacia adelante
 
-#define S_RIVAL_1 2
-#define S_RIVAL_2 4
-#define S_RIVAL_3 0
-#define S_RIVAL_4 1
+#define S_RIVAL_1 0
+#define S_RIVAL_2 1
+#define S_RIVAL_3 3
+#define S_RIVAL_4 4
 
-#define S_LINEA_I 3
-#define S_LINEA_D 21
+#define S_LINEA_I 7
+#define S_LINEA_D 2
 
-#define PWM_MD 6
-#define PWM_MI 9
+#define PWM_MD 8
+#define PWM_MI 5
 
-#define LED_ADELANTE 20
-#define LED_ATRAS 8
-#define LED_DERECHA 7
-#define LED_IZQUIERDA 10
+#define NEOPIXEL 20
 
-#define BOTON 5
+#define BOTON 6
 
 void inicializar_pines();
 

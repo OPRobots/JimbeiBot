@@ -146,12 +146,12 @@ bool sensor_linea_D() {
   }
 }
 bool boton() {
-  if (!digitalRead(BOTON)) {
+  if (digitalRead(BOTON)) {
     contador_boton++;
   } else {
     contador_boton = 0;
   }
-  if (contador_boton >= CONTADOR_LINEA) {
+  if (contador_boton >= 4000) {
     return true;
   } else {
     return false;

@@ -12,10 +12,7 @@ void inicializar_pines(){
   pinMode(PWM_MD, OUTPUT);
   pinMode(PWM_MI, OUTPUT);
 
-  pinMode(LED_ADELANTE, OUTPUT);
-  pinMode(LED_ATRAS, OUTPUT);
-  pinMode(LED_DERECHA, OUTPUT);
-  pinMode(LED_IZQUIERDA, OUTPUT);
+  pinMode(NEOPIXEL, OUTPUT);
 
-  pinMode(BOTON, INPUT_PULLUP);
+  pinMode(BOTON, INPUT_PULLDOWN);
 }

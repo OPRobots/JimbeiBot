@@ -1,4 +1,5 @@
 #include "debug.h"
+#include "luces.h"
 #include "motores.h"
 #include "pines.h"
 #include "sensores.h"
@@ -7,9 +8,9 @@
 #define NUM_ESTRATEGIAS 5
 
 #define ESTRAT_ADELANTE 0
-#define ESTRAT_DERECHA 2
-#define ESTRAT_IZQUIERDA 3
-#define ESTRAT_ATRAS 1
+#define ESTRAT_DERECHA 1
+#define ESTRAT_IZQUIERDA 2
+#define ESTRAT_ATRAS 3
 #define ESTRAT_PID 4
 
 // Variables PID
@@ -45,18 +46,17 @@ bool debug = false;
 void setup() {
 
   inicializar_pines();
-  if (!digitalRead(BOTON)) {
+  if (digitalRead(BOTON)) {
     debug = true;
-    while (!digitalRead(BOTON)) {
+    while (digitalRead(BOTON)) {
     }
   } else {
     inicializar_motores();
 
     // Seteamos los leds en la estrategia 0 para que de el feedback nada mas arrancar
-    digitalWrite(LED_ADELANTE, true);
-    digitalWrite(LED_DERECHA, true);
-    digitalWrite(LED_ATRAS, false);
-    digitalWrite(LED_IZQUIERDA, true);
+    set_led(RGB_TOP, true);
+    set_led(RGB_RIGHT, false);
+    set_led(RGB_LEFT, false);
   }
   Serial.begin(115200);
 }
@@ -94,10 +94,7 @@ void loop() {
       contador = (contador + 1) % TIEMPO_PID; // Avanza el índice circularmente cuando supera TIEMPO_PID vuelve a ser 0
 
       if (contador == 0) { // Este if se ejecuta una vez cada tiempo establecido en TIEMPO_PID en ms
-        digitalWrite(LED_ADELANTE, true);
-        digitalWrite(LED_DERECHA, true);
-        digitalWrite(LED_ATRAS, true);
-        digitalWrite(LED_IZQUIERDA, true);
+
         // imprimir_sensores_raw();
         // imprimir_sensores_filtrados();
         // Serial.println(posicion_rival_chusta());
@@ -121,7 +118,7 @@ void loop() {
           posicion_anterior = proporcional;
         }
         // aqui aplicamos la correccion del pid a las velocidades de los motores
-        if (estrategia == ESTRAT_PID){
+        if (estrategia == ESTRAT_PID) {
           vel = 0;
         }
         asignacion_vel_motores();
@@ -133,25 +130,27 @@ void loop() {
 
   } else if (inicio && (millis() - millisInicio > 4000)) {
 
-    digitalWrite(LED_ATRAS, false);
-    digitalWrite(LED_IZQUIERDA, true);
+    set_led(RGB_TOP, true);
+    set_led(RGB_RIGHT, true);
+    set_led(RGB_LEFT, true);
 
   } else if (inicio && (millis() - millisInicio > 3000)) {
 
-    digitalWrite(LED_DERECHA, false);
-    digitalWrite(LED_ATRAS, true);
+    set_led(RGB_TOP, true);
+    set_led(RGB_RIGHT, true);
+    set_led(RGB_LEFT, false);
 
   } else if (inicio && (millis() - millisInicio > 2000)) {
 
-    digitalWrite(LED_ADELANTE, false);
-    digitalWrite(LED_DERECHA, true);
+    set_led(RGB_TOP, true);
+    set_led(RGB_RIGHT, false);
+    set_led(RGB_LEFT, false);
 
   } else if (inicio && (millis() - millisInicio > 1000)) {
 
-    digitalWrite(LED_ADELANTE, true);
-    digitalWrite(LED_DERECHA, false);
-    digitalWrite(LED_ATRAS, false);
-    digitalWrite(LED_IZQUIERDA, false);
+    set_led(RGB_TOP, false);
+    set_led(RGB_RIGHT, false);
+    set_led(RGB_LEFT, false);
 
   } else {
     parar_motores();
@@ -161,14 +160,9 @@ void loop() {
       parpadeo = millis();
       while (boton()) {
         if ((millis() - pulsa) > 350) {
-          if ((millis() - parpadeo) > 75) {
-            parpadeo = millis();
-            estado = !estado;
-            digitalWrite(LED_ADELANTE, estado);
-            digitalWrite(LED_DERECHA, estado);
-            digitalWrite(LED_ATRAS, estado);
-            digitalWrite(LED_IZQUIERDA, estado);
-          }
+          rainbow_led(RGB_TOP);
+          rainbow_led(RGB_RIGHT);
+          rainbow_led(RGB_LEFT);
         }
       }
       tiempoPulsado = millis() - pulsa;
@@ -182,41 +176,36 @@ void loop() {
         switch (estrategia) {
           case ESTRAT_ADELANTE:
             vel = VEL_BASE + 65;
-            digitalWrite(LED_ADELANTE, true);
-            digitalWrite(LED_DERECHA, true);
-            digitalWrite(LED_ATRAS, false);
-            digitalWrite(LED_IZQUIERDA, true);
+            set_led(RGB_TOP, true);
+            set_led(RGB_RIGHT, false);
+            set_led(RGB_LEFT, false);
             break;
           case ESTRAT_DERECHA:
             vel = 0;
             correccion = 180;
-            digitalWrite(LED_ADELANTE, true);
-            digitalWrite(LED_DERECHA, true);
-            digitalWrite(LED_ATRAS, true);
-            digitalWrite(LED_IZQUIERDA, false);
+            set_led(RGB_TOP, false);
+            set_led(RGB_RIGHT, true);
+            set_led(RGB_LEFT, false);
             break;
           case ESTRAT_IZQUIERDA:
             vel = 0;
             correccion = -180;
-            digitalWrite(LED_ADELANTE, true);
-            digitalWrite(LED_DERECHA, false);
-            digitalWrite(LED_ATRAS, true);
-            digitalWrite(LED_IZQUIERDA, true);
+            set_led(RGB_TOP, false);
+            set_led(RGB_RIGHT, false);
+            set_led(RGB_LEFT, true);
             break;
           case ESTRAT_ATRAS:
             vel = 0;
             correccion = 280;
-            digitalWrite(LED_ADELANTE, false);
-            digitalWrite(LED_DERECHA, true);
-            digitalWrite(LED_ATRAS, true);
-            digitalWrite(LED_IZQUIERDA, true);
+            set_led(RGB_TOP, false);
+            set_led(RGB_RIGHT, true);
+            set_led(RGB_LEFT, true);
             break;
           case ESTRAT_PID:
             vel = 0;
-            digitalWrite(LED_ADELANTE, true);
-            digitalWrite(LED_DERECHA, true);
-            digitalWrite(LED_ATRAS, true);
-            digitalWrite(LED_IZQUIERDA, true);
+            set_led(RGB_TOP, true);
+            set_led(RGB_RIGHT, true);
+            set_led(RGB_LEFT, true);
             break;
 
           default:

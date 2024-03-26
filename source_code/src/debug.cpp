@@ -1,4 +1,5 @@
 #include "debug.h"
+#include "luces.h"
 
 #define MODOS_DEBUG 3
 int modo_debug = 0;
@@ -14,48 +15,42 @@ void debug_inicio(){
         filtro_sensores();
       }
       if (sensor1()) {
-        digitalWrite(LED_IZQUIERDA, true);
+        
+    set_led(RGB_LEFT, true);
       } else {
-        digitalWrite(LED_IZQUIERDA, false);
+    set_led(RGB_LEFT, false);
       }
       if (sensor2()) {
-        digitalWrite(LED_ADELANTE, true);
+    set_led(RGB_LEFT, true);
       } else {
-        digitalWrite(LED_ADELANTE, false);
+    set_led(RGB_LEFT, false);
       }
       if (sensor3()) {
-        digitalWrite(LED_ATRAS, true);
+    set_led(RGB_RIGHT, true);
       } else {
-        digitalWrite(LED_ATRAS, false);
+    set_led(RGB_LEFT, false);
       }
       if (sensor4()) {
-        digitalWrite(LED_DERECHA, true);
+    set_led(RGB_RIGHT, true);
       } else {
-        digitalWrite(LED_DERECHA, false);
+    set_led(RGB_LEFT, false);
       }
     }
     if (modo_debug == 1) {
       if (!sensor_linea_D()) {
-        digitalWrite(LED_ADELANTE, true);
-        digitalWrite(LED_DERECHA, true);
-        digitalWrite(LED_ATRAS, true);
-        digitalWrite(LED_IZQUIERDA, false);
+
+    set_led(RGB_RIGHT, true);
       } else {
-        digitalWrite(LED_ADELANTE, false);
-        digitalWrite(LED_DERECHA, false);
-        digitalWrite(LED_ATRAS, false);
-        digitalWrite(LED_IZQUIERDA, false);
+    clear_led(RGB_TOP);
+    clear_led(RGB_RIGHT);
+    clear_led(RGB_LEFT);
       }
       if (!sensor_linea_I()) {
-        digitalWrite(LED_ADELANTE, true);
-        digitalWrite(LED_DERECHA, false);
-        digitalWrite(LED_ATRAS, true);
-        digitalWrite(LED_IZQUIERDA, true);
+    set_led(RGB_LEFT, true);
       } else {
-        digitalWrite(LED_ADELANTE, false);
-        digitalWrite(LED_DERECHA, false);
-        digitalWrite(LED_ATRAS, false);
-        digitalWrite(LED_IZQUIERDA, false);
+    clear_led(RGB_TOP);
+    clear_led(RGB_RIGHT);
+    clear_led(RGB_LEFT);
       }
     }
     if (modo_debug == 2) {
