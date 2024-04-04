@@ -14,7 +14,7 @@
 #define ESTRAT_PID 4
 
 // Variables PID
-#define VEL_BASE 150
+#define VEL_BASE 250
 #define TIEMPO_PID 10
 #define KP 1.2
 #define KD 0.8

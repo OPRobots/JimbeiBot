@@ -1,8 +1,8 @@
 #include "motores.h"
 
-#define UMBRAL_COGGIN 110
+#define UMBRAL_COGGIN 60
 
-const int MAGNITUD_FILTRO = 30;
+const int MAGNITUD_FILTRO = 40;
 
 int Mot_D = 0;
 int Mot_I = 1;
@@ -82,14 +82,14 @@ Vel_I = (Vel_I + Vel_I_anterior)/2;
     Vel_I = 0;
   }
 
-  // de tal modo que si la correccion hace que una rueda se ponga a mas de 255, se limita a 255 y a la otra se le aplique la correccion restante
-  if (Vel_D > 500) {
-    Vel_I = Vel_I - (Vel_D - 500);
-    Vel_D = 500;
+  // de tal modo que si la correccion hace que una rueda se ponga a mas de 750, se limita a 750 y a la otra se le aplique la correccion restante
+  if (Vel_D > 750) {
+    Vel_I = Vel_I - (Vel_D - 750);
+    Vel_D = 750;
   }
-  if (Vel_I > 500) {
-    Vel_D = Vel_D - (Vel_I - 500);
-    Vel_I = 500;
+  if (Vel_I > 750) {
+    Vel_D = Vel_D - (Vel_I - 750);
+    Vel_I = 750;
   }
 
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
@@ -120,16 +120,16 @@ void secuencia_linea_D() {
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
   delay(50);
-  Vel_D = -250;
-  Vel_I = -250;
+  Vel_D = -500;
+  Vel_I = -500;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  delay(150);
-  Vel_D = 200;
-  Vel_I = -200;
+  delay(280);
+  Vel_D = 500;
+  Vel_I = -500;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  delay(300);
+  delay(400);
   Vel_D = 0;
   Vel_I = 0;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
@@ -141,16 +141,16 @@ void secuencia_linea_I() {
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
   delay(50);
-  Vel_D = -200;
-  Vel_I = -200;
+  Vel_D = -500;
+  Vel_I = -500;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  delay(150);
-  Vel_D = -180;
-  Vel_I = 180;
+  delay(280);
+  Vel_D = -500;
+  Vel_I = 500;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  delay(200);
+  delay(400);
   Vel_D = 0;
   Vel_I = 0;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
