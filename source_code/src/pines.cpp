@@ -1,6 +1,6 @@
 #include "pines.h"
 
-void inicializar_pines(){
+void inicializar_pines() {
   pinMode(S_RIVAL_1, INPUT);
   pinMode(S_RIVAL_2, INPUT);
   pinMode(S_RIVAL_3, INPUT);
@@ -15,4 +15,6 @@ void inicializar_pines(){
   pinMode(NEOPIXEL, OUTPUT);
 
   pinMode(BOTON, INPUT_PULLDOWN);
+  pinMode(MOD_START, INPUT);
+  attachInterrupt(digitalPinToInterrupt(MOD_START), rc5_isr, CHANGE);
 }

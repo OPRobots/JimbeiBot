@@ -3,6 +3,7 @@
 #include "motores.h"
 #include "pines.h"
 #include "sensores.h"
+#include "control.h"
 #include <Arduino.h>
 
 #define NUM_ESTRATEGIAS 5
@@ -32,7 +33,6 @@ int vel = 0;
 // Otras variables
 
 int estrategia = 0;
-float millisInicio = 0;
 int tiempoPulsado = 0;
 long pulsa = 0;
 long parpadeo = 0;
@@ -68,7 +68,7 @@ void loop() {
     return;
   }
 
-  if (inicio && (millis() - millisInicio > 5000)) {
+  if (is_started() && (millis() - ms_started() > 5000)) {
 
     if (millis() >= millisPID + 1) {
       filtro_sensores();
@@ -128,25 +128,25 @@ void loop() {
       millisPID = millis();
     }
 
-  } else if (inicio && (millis() - millisInicio > 4000)) {
+  } else if (is_started() && (millis() - ms_started() > 4000)) {
 
     set_led(RGB_TOP, true);
     set_led(RGB_RIGHT, true);
     set_led(RGB_LEFT, true);
 
-  } else if (inicio && (millis() - millisInicio > 3000)) {
+  } else if (is_started() && (millis() - ms_started() > 3000)) {
 
     set_led(RGB_TOP, true);
     set_led(RGB_RIGHT, true);
     set_led(RGB_LEFT, false);
 
-  } else if (inicio && (millis() - millisInicio > 2000)) {
+  } else if (is_started() && (millis() - ms_started() > 2000)) {
 
     set_led(RGB_TOP, true);
     set_led(RGB_RIGHT, false);
     set_led(RGB_LEFT, false);
 
-  } else if (inicio && (millis() - millisInicio > 1000)) {
+  } else if (is_started() && (millis() - ms_started() > 1000)) {
 
     set_led(RGB_TOP, false);
     set_led(RGB_RIGHT, false);
@@ -212,8 +212,7 @@ void loop() {
             break;
         }
       } else {
-        inicio = true;
-        millisInicio = millis();
+        start(millis());
       }
     }
   }

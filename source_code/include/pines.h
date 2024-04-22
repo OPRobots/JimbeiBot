@@ -1,6 +1,7 @@
 #ifndef __PINES_H
 #define __PINES_H
 #include "Arduino.h"
+#include "rc5.h"
 
 // PINES
 // Sensores numerados por orden de colocación en el robot mirandolo desde arriba con la cuchilla hacia adelante
@@ -19,6 +20,7 @@
 #define NEOPIXEL 20
 
 #define BOTON 6
+#define MOD_START 21
 
 void inicializar_pines();
 
