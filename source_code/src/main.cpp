@@ -15,10 +15,10 @@
 #define ESTRAT_PID 4
 
 // Variables PID
-#define VEL_BASE 250
+#define VEL_BASE 500
 #define TIEMPO_PID 10
-#define KP 1.2
-#define KD 0.8
+#define KP 2.4
+#define KD 3.0
 #define KI 0
 
 #define ANULAR_LINEA 1 // 0 = ANULADO / 1 = NO ANULDO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
@@ -196,13 +196,13 @@ void loop() {
             break;
           case ESTRAT_ATRAS:
             vel = 0;
-            correccion = 280;
+            correccion = 750;
             set_led(RGB_TOP, false);
             set_led(RGB_RIGHT, true);
             set_led(RGB_LEFT, true);
             break;
           case ESTRAT_PID:
-            vel = 0;
+            vel = VEL_BASE/2.0;
             set_led(RGB_TOP, true);
             set_led(RGB_RIGHT, true);
             set_led(RGB_LEFT, true);
