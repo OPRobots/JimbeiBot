@@ -59,13 +59,10 @@ static void rc5_manage_command(uint16_t message) {
   unsigned char address = (message & ADDRESS_MASK) >> ADDRESS_SHIFT;
   unsigned char command = (message & COMMAND_MASK) >> COMMAND_SHIFT;
   switch (address) {
-    // case ADDRESS_PROG:
-    //   rc5_stored_data[0] = command;
-    //   rc5_stored_data[1] = command + 1;
-    //   EEPROM.writeUShort(EEPROM_ADDR_RC5_START, rc5_stored_data[DATA_START]);
-    //   EEPROM.writeUShort(EEPROM_ADDR_RC5_STOP, rc5_stored_data[DATA_STOP]);
-    //   EEPROM.commit();
-    //   break;
+     case ADDRESS_PROG:
+       rc5_stored_data[0] = command;
+       rc5_stored_data[1] = command + 1;
+       break;
     case ADDRESS_COMP:
       if (command == rc5_stored_data[DATA_START]) {
         start(millis());
@@ -116,11 +113,6 @@ static void rc5_decode_pulse(enum RC5_TRIGGER trigger, uint32_t elapsed) {
   } else {
     reset();
   }
-}
-
-void rc5_init(void) {
-  // rc5_stored_data[DATA_START] = EEPROM.readUShort(EEPROM_ADDR_RC5_START);
-  // rc5_stored_data[DATA_STOP] = EEPROM.readUShort(EEPROM_ADDR_RC5_STOP);
 }
 
 void rc5_register(enum RC5_TRIGGER trigger) {

@@ -62,6 +62,8 @@ void setup() {
 }
 
 void loop() {
+  //test mando y leds
+  
 
   if (debug) {
     filtro_sensores();
@@ -69,7 +71,7 @@ void loop() {
     return;
   }
 
-  if (is_started() && (millis() - ms_started() > 5000)) {
+  if ((is_started() && (millis() - ms_started() > 5000)) && is_started()) {
 
     if (millis() >= millisPID + 1) {
       filtro_sensores();
@@ -258,7 +260,8 @@ void loop() {
           default:
             break;
         }
-      } else {
+      } else if (tiempoPulsado >= 350 || is_started()){
+        set_starting(true);
         start(millis());
       }
     }
