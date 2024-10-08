@@ -1,9 +1,9 @@
+#include "control.h"
 #include "debug.h"
 #include "luces.h"
 #include "motores.h"
 #include "pines.h"
 #include "sensores.h"
-#include "control.h"
 #include <Arduino.h>
 
 #define NUM_ESTRATEGIAS 5
@@ -15,13 +15,13 @@
 #define ESTRAT_PID 4
 
 // Variables PID
-#define VEL_BASE 500
-#define TIEMPO_PID 10
-#define KP 2.4
+#define VEL_BASE 0
+#define TIEMPO_PID 4
+#define KP 1
 #define KD 3.0
 #define KI 0
 
-#define ANULAR_LINEA 1 // 0 = ANULADO / 1 = NO ANULDO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
+#define ANULAR_LINEA 0 // 0 = ANULADO / 1 = NO ANULADO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
 
 int proporcional = 0;
 int derivada = 0;
@@ -42,7 +42,7 @@ long millisPID = 0;
 int contador = 0;
 bool usar_PID = 0;
 bool debug = false;
-
+bool estrategiaRealizada = false;
 void setup() {
 
   inicializar_pines();
@@ -64,6 +64,7 @@ void setup() {
 void loop() {
 
   if (debug) {
+    filtro_sensores();
     debug_inicio();
     return;
   }
@@ -87,8 +88,26 @@ void loop() {
         posicion_anterior = 0;
       } else if (sensor1() || sensor2() || sensor3() || sensor4()) {
         usar_PID = true;
-        if (!(sensor1() && sensor4())) {
+        if (!sensor3()) {
           vel = VEL_BASE;
+        }
+      }
+      if (!estrategiaRealizada) {
+        estrategiaRealizada = true;
+        switch (estrategia) {
+          case ESTRAT_ADELANTE:
+            vel = VEL_BASE + 65;
+            delay(20);
+            break;
+          case ESTRAT_DERECHA:
+            arranque_derecha();
+            break;
+          case ESTRAT_IZQUIERDA:
+            arranque_izquierda();
+            break;
+          case ESTRAT_ATRAS:
+            arranque_espaldas();
+            break;
         }
       }
       contador = (contador + 1) % TIEMPO_PID; // Avanza el índice circularmente cuando supera TIEMPO_PID vuelve a ser 0
@@ -99,6 +118,7 @@ void loop() {
         // imprimir_sensores_filtrados();
         // Serial.println(posicion_rival_chusta());
         // delay(100);
+        // return;
         //////////////////////////////
         ////    Calculo del PID   ////
         //////////////////////////////
@@ -109,6 +129,9 @@ void loop() {
 
           if (proporcional == 0) {
             vel += 2;
+            if (vel > 750) {
+              vel = VEL_BASE;
+            }
           } else if (proporcional > 75) {
             vel = VEL_BASE;
           }
@@ -160,9 +183,37 @@ void loop() {
       parpadeo = millis();
       while (boton()) {
         if ((millis() - pulsa) > 350) {
-          rainbow_led(RGB_TOP);
-          rainbow_led(RGB_RIGHT);
-          rainbow_led(RGB_LEFT);
+           switch (estrategia) {
+          case ESTRAT_ADELANTE:
+            set_led_confirmado(RGB_TOP, true);
+            set_led_confirmado(RGB_RIGHT, false);
+            set_led_confirmado(RGB_LEFT, false);
+            break;
+          case ESTRAT_DERECHA:
+            set_led_confirmado(RGB_TOP, false);
+            set_led_confirmado(RGB_RIGHT, true);
+            set_led_confirmado(RGB_LEFT, false);
+            break;
+          case ESTRAT_IZQUIERDA:
+            set_led_confirmado(RGB_TOP, false);
+            set_led_confirmado(RGB_RIGHT, false);
+            set_led_confirmado(RGB_LEFT, true);
+            break;
+          case ESTRAT_ATRAS:
+            set_led_confirmado(RGB_TOP, false);
+            set_led_confirmado(RGB_RIGHT, true);
+            set_led_confirmado(RGB_LEFT, true);
+            break;
+          case ESTRAT_PID:
+            vel = VEL_BASE / 2.0;
+            set_led_confirmado(RGB_TOP, true);
+            set_led_confirmado(RGB_RIGHT, true);
+            set_led_confirmado(RGB_LEFT, true);
+            break;
+
+          default:
+            break;
+        }
         }
       }
       tiempoPulsado = millis() - pulsa;
@@ -181,28 +232,22 @@ void loop() {
             set_led(RGB_LEFT, false);
             break;
           case ESTRAT_DERECHA:
-            vel = 0;
-            correccion = 180;
             set_led(RGB_TOP, false);
             set_led(RGB_RIGHT, true);
             set_led(RGB_LEFT, false);
             break;
           case ESTRAT_IZQUIERDA:
-            vel = 0;
-            correccion = -180;
             set_led(RGB_TOP, false);
             set_led(RGB_RIGHT, false);
             set_led(RGB_LEFT, true);
             break;
           case ESTRAT_ATRAS:
-            vel = 0;
-            correccion = 750;
             set_led(RGB_TOP, false);
             set_led(RGB_RIGHT, true);
             set_led(RGB_LEFT, true);
             break;
           case ESTRAT_PID:
-            vel = VEL_BASE/2.0;
+            vel = VEL_BASE / 2.0;
             set_led(RGB_TOP, true);
             set_led(RGB_RIGHT, true);
             set_led(RGB_LEFT, true);

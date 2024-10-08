@@ -10,5 +10,8 @@ void asignacion_vel_motores();
 void parar_motores();
 void secuencia_linea_D();
 void secuencia_linea_I();
+void arranque_derecha();
+void arranque_izquierda();
+void arranque_espaldas();
 
 #endif

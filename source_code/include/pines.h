@@ -6,8 +6,8 @@
 // PINES
 // Sensores numerados por orden de colocación en el robot mirandolo desde arriba con la cuchilla hacia adelante
 
-#define S_RIVAL_1 0
-#define S_RIVAL_2 1
+#define S_RIVAL_1 1
+#define S_RIVAL_2 0
 #define S_RIVAL_3 3
 #define S_RIVAL_4 4
 

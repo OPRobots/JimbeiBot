@@ -1,12 +1,12 @@
 #include "sensores.h"
 
 const int MAGNITUD_FILTRO = 20;
-const int UMBRAL = 1700;
-const int UMBRAL_HISTERESIS = 1000;
+const int MAGNITUD_FILTRO_TEMPORAL = 10; // Tiempo en ms para cambiar de estado el sensor
+const int UMBRAL = 1300;
+const int UMBRAL_HISTERESIS = 850;
 const int CONTADOR_LINEA = 6;
 
 int posicion = 0;
-
 bool rival_encima = false;
 
 int contador_boton = 0;
@@ -22,6 +22,20 @@ bool s_rival_1_bool = false;
 bool s_rival_2_bool = false;
 bool s_rival_3_bool = false;
 bool s_rival_4_bool = false;
+
+bool last_s_rival_1_bool = false;
+bool last_s_rival_2_bool = false;
+bool last_s_rival_3_bool = false;
+bool last_s_rival_4_bool = false;
+
+long s_rival_1_ms_true = 0;
+long s_rival_1_ms_false = 0;
+long s_rival_2_ms_true = 0;
+long s_rival_2_ms_false = 0;
+long s_rival_3_ms_true = 0;
+long s_rival_3_ms_false = 0;
+long s_rival_4_ms_true = 0;
+long s_rival_4_ms_false = 0;
 
 int Filtro_s1[MAGNITUD_FILTRO];
 int Filtro_s2[MAGNITUD_FILTRO];
@@ -65,47 +79,110 @@ void filtro_sensores_histeresis() {
   // s_rival_4 = analogRead(S_RIVAL_4);
 
   if (s_rival_1 > UMBRAL) {
+    if (!s_rival_1_bool) {
+      s_rival_1_ms_true = millis();
+    }
     s_rival_1_bool = true;
   } else if (s_rival_1 < UMBRAL_HISTERESIS) {
+    if (s_rival_1_bool) {
+      s_rival_1_ms_false = millis();
+    }
     s_rival_1_bool = false;
   }
   if (s_rival_2 > UMBRAL) {
+    if (!s_rival_2_bool) {
+      s_rival_2_ms_true = millis();
+    }
     s_rival_2_bool = true;
   } else if (s_rival_2 < UMBRAL_HISTERESIS) {
+    if (s_rival_2_bool) {
+      s_rival_2_ms_false = millis();
+    }
     s_rival_2_bool = false;
   }
   if (s_rival_3 > UMBRAL) {
+    if (!s_rival_3_bool) {
+      s_rival_3_ms_true = millis();
+    }
     s_rival_3_bool = true;
   } else if (s_rival_3 < UMBRAL_HISTERESIS) {
+    if (s_rival_3_bool) {
+      s_rival_3_ms_false = millis();
+    }
     s_rival_3_bool = false;
   }
   if (s_rival_4 > UMBRAL) {
+    if (!s_rival_4_bool) {
+      s_rival_4_ms_true = millis();
+    }
     s_rival_4_bool = true;
   } else if (s_rival_4 < UMBRAL_HISTERESIS) {
+    if (s_rival_4_bool) {
+      s_rival_4_ms_false = millis();
+    }
     s_rival_4_bool = false;
   }
 
   // Filtro para intentar evitar la perdida de deteccion cuando el robot rival esta mas cerca de 4cm (limite de los sensores)
   if (!s_rival_1_bool && !s_rival_2_bool && !s_rival_3_bool && !s_rival_4_bool) {
     rival_encima = false;
-  } else if ((s_rival_1 > 3000 && s_rival_4 > 3000) || rival_encima) {
-    s_rival_1_bool = true;
-    s_rival_4_bool = true;
+  } else if ((s_rival_3 > 3000) || rival_encima) {
+    if (!s_rival_2_bool) {
+      s_rival_2_ms_true = millis();
+    }
+    s_rival_2_bool = true;
+    if (!s_rival_3_bool) {
+      s_rival_3_ms_true = millis();
+    }
+    s_rival_3_bool = true;
     rival_encima = true;
   }
 }
 
 bool sensor1() {
-  return s_rival_1_bool;
+  // Serial.printf("s_rival_1_bool: %d - last_s_rival_1_bool: %d - s_rival_1_ms_true: %ld - s_rival_1_ms_false: %ld - millis: %ld\n", s_rival_1_bool, last_s_rival_1_bool, s_rival_1_ms_true, s_rival_1_ms_false, millis());
+  if (s_rival_1_bool && (millis() - s_rival_1_ms_true) > MAGNITUD_FILTRO_TEMPORAL) {
+    last_s_rival_1_bool = true;
+    return last_s_rival_1_bool;
+  } else if (!s_rival_1_bool && (millis() - s_rival_1_ms_false) > MAGNITUD_FILTRO_TEMPORAL) {
+    last_s_rival_1_bool = false;
+    return last_s_rival_1_bool;
+  } else {
+    return last_s_rival_1_bool;
+  }
 }
 bool sensor2() {
-  return s_rival_2_bool;
+  if (s_rival_2_bool && (millis() - s_rival_2_ms_true) > MAGNITUD_FILTRO_TEMPORAL) {
+    last_s_rival_2_bool = true;
+    return last_s_rival_2_bool;
+  } else if (!s_rival_2_bool && (millis() - s_rival_2_ms_false) > MAGNITUD_FILTRO_TEMPORAL) {
+    last_s_rival_2_bool = false;
+    return last_s_rival_2_bool;
+  } else {
+    return last_s_rival_2_bool;
+  }
 }
 bool sensor3() {
-  return s_rival_3_bool;
+  if (s_rival_3_bool && (millis() - s_rival_3_ms_true) > MAGNITUD_FILTRO_TEMPORAL) {
+    last_s_rival_3_bool = true;
+    return last_s_rival_3_bool;
+  } else if (!s_rival_3_bool && (millis() - s_rival_3_ms_false) > MAGNITUD_FILTRO_TEMPORAL) {
+    last_s_rival_3_bool = false;
+    return last_s_rival_3_bool;
+  } else {
+    return last_s_rival_3_bool;
+  }
 }
 bool sensor4() {
-  return s_rival_4_bool;
+  if (s_rival_4_bool && (millis() - s_rival_4_ms_true) > MAGNITUD_FILTRO_TEMPORAL) {
+    last_s_rival_4_bool = true;
+    return last_s_rival_4_bool;
+  } else if (!s_rival_4_bool && (millis() - s_rival_4_ms_false) > MAGNITUD_FILTRO_TEMPORAL) {
+    last_s_rival_4_bool = false;
+    return last_s_rival_4_bool;
+  } else {
+    return last_s_rival_4_bool;
+  }
 }
 
 int sensor1_analog() {
@@ -159,25 +236,17 @@ bool boton() {
 }
 
 int posicion_rival_chusta() {
-  if (sensor1() && !sensor2() && !sensor3() && !sensor4()) {
-    posicion = -50;
-  } else if (!sensor1() && sensor2() && !sensor3() && !sensor4()) {
-    posicion = -100;
-  } else if (!sensor1() && !sensor2() && sensor3() && !sensor4()) {
-    posicion = 100;
-  } else if (!sensor1() && !sensor2() && !sensor3() && sensor4()) {
-    posicion = 50;
-  } else if (sensor1() && sensor4()) {
+  if (sensor3()) {
     posicion = 0;
-  } else if (sensor1() && sensor2() && !sensor3() && !sensor4()) {
-    posicion = -75;
-  } else if (!sensor1() && !sensor2() && sensor3() && sensor4()) {
-    posicion = 75;
-  } else if (!sensor1() && !sensor2() && !sensor3() && !sensor4()) {
+  } else if (sensor1()) {
+    posicion = -50;
+  } else if (sensor4()) {
+    posicion = 50;
+  } else if (!sensor1() && !sensor3() && !sensor4()) {
     if (posicion > 0) {
-      posicion = 150;
-    } else {
-      posicion = -150;
+      posicion = 120;
+    } else if (posicion < 0) {
+      posicion = -120;
     }
   }
   return posicion;

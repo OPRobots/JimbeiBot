@@ -32,6 +32,19 @@ void set_led(enum LEDS led, bool on) {
     blink_led_ms[led] = millis();
   }
 }
+void set_led_confirmado(enum LEDS led, bool on) {
+  if (on) {
+    pixels.setPixelColor(led, pixels.Color(0, 50, 0));
+    pixels.show();
+    toggle_led_state[led] = true;
+    blink_led_ms[led] = millis();
+  } else {
+    pixels.setPixelColor(led, pixels.Color(0, 0, 0));
+    pixels.show();
+    toggle_led_state[led] = false;
+    blink_led_ms[led] = millis();
+  }
+}
 
 /**
  * @brief Apaga un LED

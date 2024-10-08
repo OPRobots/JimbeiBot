@@ -1,8 +1,8 @@
 #include "motores.h"
 
-#define UMBRAL_COGGIN 60
+#define UMBRAL_COGGIN 20
 
-const int MAGNITUD_FILTRO = 40;
+const int MAGNITUD_FILTRO = 10;
 
 int Mot_D = 0;
 int Mot_I = 1;
@@ -161,4 +161,55 @@ void secuencia_linea_I() {
   Vel_I = 250;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+}
+void arranque_derecha() {
+  Vel_D = -750;
+  Vel_I = 750;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(225);
+  Vel_D = 500;
+  Vel_I = 500;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(300);
+  Vel_D = 0;
+  Vel_I = 0;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(1000);
+}
+void arranque_izquierda() {
+  Vel_D = 750;
+  Vel_I = -750;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(225);
+  Vel_D = 500;
+  Vel_I = 500;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(300);
+  Vel_D = 0;
+  Vel_I = 0;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(1000);
+}
+void arranque_espaldas() {
+   Vel_D = -750;
+  Vel_I = 750;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(325);
+  Vel_D = 500;
+  Vel_I = 500;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(300);
+  Vel_D = 0;
+  Vel_I = 0;
+  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  delay(1000);
 }

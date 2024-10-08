@@ -11,6 +11,7 @@ enum LEDS {
 };
 
 void set_led(enum LEDS led, bool on);
+void set_led_confirmado(enum LEDS led, bool on);
 void clear_led(enum LEDS led);
 
 void blink_led(enum LEDS led, int r, int g, int b, int ms);
