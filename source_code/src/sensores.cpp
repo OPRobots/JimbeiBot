@@ -1,8 +1,8 @@
 #include "sensores.h"
 
-const int MAGNITUD_FILTRO = 20;
-const int MAGNITUD_FILTRO_TEMPORAL = 15; // Tiempo en ms para cambiar de estado el sensor
-const int UMBRAL = 1500;
+const int MAGNITUD_FILTRO = 25;
+const int MAGNITUD_FILTRO_TEMPORAL = 20; // Tiempo en ms para cambiar de estado el sensor
+const int UMBRAL = 1600;
 const int UMBRAL_HISTERESIS = 1200;
 const int CONTADOR_LINEA = 6;
 

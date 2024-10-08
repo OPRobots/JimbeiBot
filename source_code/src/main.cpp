@@ -79,13 +79,13 @@ void loop() {
       if (!sensor_linea_D() && ANULAR_LINEA) {
         secuencia_linea_D();
         usar_PID = true;
-        vel = 0;
+        vel = VEL_BASE;
         correccion = 0;
         posicion_anterior = 0;
       } else if (!sensor_linea_I() && ANULAR_LINEA) {
         secuencia_linea_I();
         usar_PID = true;
-        vel = 0;
+        vel = VEL_BASE;
         correccion = 0;
         posicion_anterior = 0;
       } else if (sensor1() || sensor2() || sensor3() || sensor4()) {
@@ -111,6 +111,7 @@ void loop() {
             arranque_espaldas();
             break;
         }
+        vel = VEL_BASE;
       }
       contador = (contador + 1) % TIEMPO_PID; // Avanza el índice circularmente cuando supera TIEMPO_PID vuelve a ser 0
 
