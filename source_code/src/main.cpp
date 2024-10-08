@@ -15,13 +15,13 @@
 #define ESTRAT_PID 4
 
 // Variables PID
-#define VEL_BASE 0
+#define VEL_BASE 300
 #define TIEMPO_PID 4
-#define KP 1
-#define KD 3.0
+#define KP 3
+#define KD 6.0
 #define KI 0
 
-#define ANULAR_LINEA 0 // 0 = ANULADO / 1 = NO ANULADO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
+#define ANULAR_LINEA 1 // 0 = ANULADO / 1 = NO ANULADO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
 
 int proporcional = 0;
 int derivada = 0;
@@ -128,7 +128,7 @@ void loop() {
           derivada = proporcional - posicion_anterior;
 
           if (proporcional == 0) {
-            vel += 2;
+            //vel += 2;
             if (vel > 750) {
               vel = VEL_BASE;
             }
@@ -144,6 +144,8 @@ void loop() {
         if (estrategia == ESTRAT_PID) {
           vel = 0;
         }
+        //Serial.println(correccion);
+        //return;
         asignacion_vel_motores();
       }
       calculo_vel_motores(vel, correccion);

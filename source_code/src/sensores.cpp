@@ -1,9 +1,9 @@
 #include "sensores.h"
 
 const int MAGNITUD_FILTRO = 20;
-const int MAGNITUD_FILTRO_TEMPORAL = 10; // Tiempo en ms para cambiar de estado el sensor
-const int UMBRAL = 1300;
-const int UMBRAL_HISTERESIS = 850;
+const int MAGNITUD_FILTRO_TEMPORAL = 15; // Tiempo en ms para cambiar de estado el sensor
+const int UMBRAL = 1500;
+const int UMBRAL_HISTERESIS = 1200;
 const int CONTADOR_LINEA = 6;
 
 int posicion = 0;
@@ -236,17 +236,23 @@ bool boton() {
 }
 
 int posicion_rival_chusta() {
-  if (sensor3()) {
+  if (sensor2() && sensor3()) {
     posicion = 0;
+  } else if (sensor2()) {
+    posicion = -10;
+  } else if (sensor3()) {
+    posicion = 10;
   } else if (sensor1()) {
     posicion = -50;
   } else if (sensor4()) {
     posicion = 50;
-  } else if (!sensor1() && !sensor3() && !sensor4()) {
+  } else if (!sensor1() && !sensor2() && !sensor3() && !sensor4()) {
     if (posicion > 0) {
       posicion = 120;
     } else if (posicion < 0) {
       posicion = -120;
+    } else if (posicion == 0) {
+      posicion = 1;
     }
   }
   return posicion;
