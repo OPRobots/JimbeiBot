@@ -3,14 +3,20 @@
 void inicializar_pines() {
   pinMode(S_RIVAL_1, INPUT);
   pinMode(S_RIVAL_2, INPUT);
-  pinMode(S_RIVAL_3, INPUT);
-  pinMode(S_RIVAL_4, INPUT);
 
   pinMode(S_LINEA_I, INPUT);
   pinMode(S_LINEA_D, INPUT);
 
-  pinMode(PWM_MD, OUTPUT);
-  pinMode(PWM_MI, OUTPUT);
+  pinMode(MOTOR_RIGHT_A, OUTPUT);
+  pinMode(MOTOR_RIGHT_B, OUTPUT);
+  pinMode(MOTOR_LEFT_A, OUTPUT);
+  pinMode(MOTOR_LEFT_B, OUTPUT);
+  digitalWrite(MOTOR_RIGHT_A, HIGH);
+  digitalWrite(MOTOR_RIGHT_B, HIGH);
+  digitalWrite(MOTOR_LEFT_A, HIGH);
+  digitalWrite(MOTOR_LEFT_B, HIGH);
+
+  pinMode(MOTOR_SUCTION, OUTPUT);
 
   pinMode(NEOPIXEL, OUTPUT);
 

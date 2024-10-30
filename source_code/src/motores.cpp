@@ -19,15 +19,29 @@ int Filtro_MI[MAGNITUD_FILTRO];
 int i_m = 0;
 
 void inicializar_motores() {
-  ledcSetup(Mot_D, 4000, 11); // Canal de PWM (0 - 16),Frecuencia, Resolucion (nº bits)
-  ledcSetup(Mot_I, 4000, 11); // Canal de PWM (0 - 16),Frecuencia, Resolucion (nº bits)
+  // Configuración de los canales PWM del Timer
+  ledcSetup(PWM_MOTOR_RIGHT_A, PWM_MOTORS_HZ, PWM_MOTORS_RESOLUTION);
+  ledcSetup(PWM_MOTOR_RIGHT_B, PWM_MOTORS_HZ, PWM_MOTORS_RESOLUTION);
+  ledcSetup(PWM_MOTOR_LEFT_A, PWM_MOTORS_HZ, PWM_MOTORS_RESOLUTION);
+  ledcSetup(PWM_MOTOR_LEFT_B, PWM_MOTORS_HZ, PWM_MOTORS_RESOLUTION);
+  ledcSetup(PWM_SUCTION, PWM_SUCTION_HZ, PWM_SUCTION_RESOLUTION);
 
-  ledcAttachPin(PWM_MD, Mot_D);
-  ledcAttachPin(PWM_MI, Mot_I);
+  // Asignación de los pines a los canales PWM
+  ledcAttachPin(MOTOR_RIGHT_A, PWM_MOTOR_RIGHT_A);
+  ledcAttachPin(MOTOR_RIGHT_B, PWM_MOTOR_RIGHT_B);
+  ledcAttachPin(MOTOR_LEFT_A, PWM_MOTOR_LEFT_A);
+  ledcAttachPin(MOTOR_LEFT_B, PWM_MOTOR_LEFT_B);
+  ledcAttachPin(MOTOR_SUCTION, PWM_SUCTION);
 
-  ledcWrite(Mot_D, 1536); // 1536 es 75% PWM, la mitad entre 1024(50% pwm) y 2048(100% pwm)
-  ledcWrite(Mot_I, 1536);
-  delay(2000);
+  // Establece el valor inicial de los canales PWM
+  ledcWrite(PWM_MOTOR_RIGHT_A, PWM_MOTORS_MIN);
+  ledcWrite(PWM_MOTOR_RIGHT_B, PWM_MOTORS_MIN);
+  ledcWrite(PWM_MOTOR_LEFT_A, PWM_MOTORS_MIN);
+  ledcWrite(PWM_MOTOR_LEFT_B, PWM_MOTORS_MIN);
+  ledcWrite(PWM_SUCTION, PWM_SUCTION_MIN);
+
+  // Tiempo de espera para inicialización del ESC; se puede comentar si se espera manualmente (calibrando, ajustando velocidad, etc.)
+   delay(10000);
 }
 
 void calculo_vel_motores(int vel, int correccion) {
@@ -47,66 +61,68 @@ void calculo_vel_motores(int vel, int correccion) {
   }
 }
 
-void asignacion_vel_motores() {
-
-  // de tal modo que si la correccion es muy baja le aplique el minimo de velocidad al motor para evitar coggin
-  if (Vel_D > (UMBRAL_COGGIN / 2) && Vel_D < UMBRAL_COGGIN) {
-    Vel_D = UMBRAL_COGGIN;
-  } else if (Vel_D < -(UMBRAL_COGGIN / 2) && Vel_D > -(UMBRAL_COGGIN + 15)) {
-    Vel_D = -(UMBRAL_COGGIN + 15);
-  } else if (Vel_D > -(UMBRAL_COGGIN / 2) && Vel_D < (UMBRAL_COGGIN / 2)) {
-    Vel_D = 0;
+/**
+ * @brief Establece la velocidad de los motores
+ *
+ * @param velI Velocidad del motor izquierdo 0-100%
+ * @param velD Velocidad del motor derecho 0-100%
+ */
+void set_motors_speed(float velI, float velD) {
+  if (velI > 100) {
+    velI = 100;
+  } else if (velI < -100) {
+    velI = -100;
   }
 
-  if (Vel_I > (UMBRAL_COGGIN / 2) && Vel_I < UMBRAL_COGGIN) {
-    Vel_I = UMBRAL_COGGIN;
-  } else if (Vel_I < -(UMBRAL_COGGIN / 2) && Vel_I > -(UMBRAL_COGGIN + 15)) {
-    Vel_I = -(UMBRAL_COGGIN + 15);
-  } else if (Vel_I > -(UMBRAL_COGGIN / 2) && Vel_I < (UMBRAL_COGGIN / 2)) {
-    Vel_I = 0;
+  if (velI > 0) {
+    ledcWrite(PWM_MOTOR_LEFT_A, PWM_MOTORS_MAX - (PWM_MOTORS_MAX * velI / 100));
+    ledcWrite(PWM_MOTOR_LEFT_B, PWM_MOTORS_MAX);
+  } else {
+    ledcWrite(PWM_MOTOR_LEFT_A, PWM_MOTORS_MAX);
+    ledcWrite(PWM_MOTOR_LEFT_B, PWM_MOTORS_MAX - (PWM_MOTORS_MAX * abs(velI) / 100));
   }
 
-  // de tal modo que si la correccion hace que una rueda se ponga a mas de 750, se limita a 750 y a la otra se le aplique la correccion restante
-  if (Vel_D > 1000) {
-    Vel_I = Vel_I - (Vel_D - 1000);
-    Vel_D = 1000;
-  }else if(Vel_D < -1000){
-    Vel_I = Vel_I - (Vel_D + 1000);
-    Vel_D = -1000;
-  }
-  if (Vel_I > 1000) {
-    Vel_D = Vel_D - (Vel_I - 1000);
-    Vel_I = 1000;
-  }else if(Vel_I < -1000){
-    Vel_D = Vel_D - (Vel_I + 1000);
-    Vel_I = -1000;
+  if (velD > 100) {
+    velD = 100;
+  } else if (velD < -100) {
+    velD = -100;
   }
 
-  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
-  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-
-  // Serial.print(map(Vel_D, -1000, 1000, 1024, 2048));
-  // Serial.print(" ");
-  // Serial.println(map(Vel_I, -1000, 1000, 1024, 2048));
-  Serial.print(Vel_D);
-  Serial.print(" ");
-  Serial.println(Vel_I);
-  // delay(100);
+  if (velD > 0) {
+    ledcWrite(PWM_MOTOR_RIGHT_A, PWM_MOTORS_MAX);
+    ledcWrite(PWM_MOTOR_RIGHT_B, PWM_MOTORS_MAX - (PWM_MOTORS_MAX * velD / 100));
+  } else {
+    ledcWrite(PWM_MOTOR_RIGHT_A, PWM_MOTORS_MAX - (PWM_MOTORS_MAX * abs(velD) / 100));
+    ledcWrite(PWM_MOTOR_RIGHT_B, PWM_MOTORS_MAX);
+  }
 }
 void parar_motores() {
 
-  Vel_D = 0;
-  Vel_I = 0;
-  ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
-  ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  digitalWrite(MOTOR_RIGHT_A, HIGH);
+  digitalWrite(MOTOR_RIGHT_B, HIGH);
+  digitalWrite(MOTOR_LEFT_A, HIGH);
+  digitalWrite(MOTOR_LEFT_B, HIGH);
+}
+
+/**
+ * @brief Establece la velocidad del ventilador
+ *
+ * @param vel Velocidad del ventilador 0-100%
+ */
+void set_fan_speed(int vel) {
+  if (vel != 0) {
+    ledcWrite(PWM_SUCTION, map(vel, 0, 100, PWM_SUCTION_MIN, PWM_SUCTION_MAX));
+  } else {
+    ledcWrite(PWM_SUCTION, PWM_SUCTION_MIN);
+  }
 }
 
 void secuencia_linea_D() {
-  //Vel_D = 0;
-  //Vel_I = 0;
-  //ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
-  //ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  //delay(20);
+  // Vel_D = 0;
+  // Vel_I = 0;
+  // ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  // ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  // delay(20);
   Vel_D = -750;
   Vel_I = -750;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
@@ -123,11 +139,11 @@ void secuencia_linea_D() {
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
 }
 void secuencia_linea_I() {
-  //Vel_D = 0;
-  //Vel_I = 0;
-  //ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
-  //ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  //delay(20);
+  // Vel_D = 0;
+  // Vel_I = 0;
+  // ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  // ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  // delay(20);
   Vel_D = -750;
   Vel_I = -750;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
@@ -156,9 +172,9 @@ void arranque_derecha() {
   delay(200);
   Vel_D = 250;
   Vel_I = 250;
-  //ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
-  //ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  //delay(1000);
+  // ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  // ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  // delay(1000);
 }
 void arranque_izquierda() {
   Vel_D = 750;
@@ -173,12 +189,12 @@ void arranque_izquierda() {
   delay(200);
   Vel_D = 250;
   Vel_I = 250;
-  //ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
-  //ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  //delay(1000);
+  // ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  // ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  // delay(1000);
 }
 void arranque_espaldas() {
-   Vel_D = -750;
+  Vel_D = -750;
   Vel_I = 750;
   ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
   ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
@@ -190,7 +206,7 @@ void arranque_espaldas() {
   delay(200);
   Vel_D = 250;
   Vel_I = 250;
-  //ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
-  //ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
-  //delay(1000);
+  // ledcWrite(Mot_D, map(Vel_D, -1000, 1000, 1024, 2048));
+  // ledcWrite(Mot_I, map(Vel_I, -1000, 1000, 1024, 2048));
+  // delay(1000);
 }

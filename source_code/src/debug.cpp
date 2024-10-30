@@ -67,10 +67,6 @@ void imprimir_sensores_raw() {
   Serial.print(" ");
   Serial.print(analogRead(S_RIVAL_2));
   Serial.print(" ");
-  Serial.print(analogRead(S_RIVAL_3));
-  Serial.print(" ");
-  Serial.print(analogRead(S_RIVAL_4));
-  Serial.print(" ");
 
   Serial.print(digitalRead(S_LINEA_I));
   Serial.print(" ");

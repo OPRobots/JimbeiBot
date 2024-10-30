@@ -15,7 +15,8 @@
 #define ESTRAT_PID 4
 
 // Variables PID
-#define VEL_BASE 300
+#define VEL_BASE 100
+#define VEL_SUCCION 100
 #define TIEMPO_PID 4
 #define KP 3
 #define KD 6.0
@@ -62,16 +63,16 @@ void setup() {
 }
 
 void loop() {
-  //test mando y leds
-  
+  // test mando y leds
 
   if (debug) {
     filtro_sensores();
     debug_inicio();
     return;
   }
+  if ((is_started() && (millis() - ms_started() > 0)) && is_started()) {
 
-  if ((is_started() && (millis() - ms_started() > 5000)) && is_started()) {
+    set_fan_speed(VEL_SUCCION);
 
     if (millis() >= millisPID + 1) {
       filtro_sensores();
@@ -126,32 +127,16 @@ void loop() {
         ////    Calculo del PID   ////
         //////////////////////////////
         // Serial.println(usar_PID);
-        if (usar_PID) {
-          proporcional = posicion_rival_chusta();
-          derivada = proporcional - posicion_anterior;
-
-          if (proporcional == 0) {
-            //vel += 2;
-            if (vel > 750) {
-              vel = VEL_BASE;
-            }
-          } else if (proporcional > 75) {
-            vel = VEL_BASE;
-          }
-
-          correccion = ((KP * proporcional) + (KD * derivada)); // + (ki * integral));
-          // Serial.println(correccion);
-          posicion_anterior = proporcional;
+        if (sensor1() && sensor2()) {
+          set_motors_speed(VEL_BASE, VEL_BASE);
+        } else if (sensor1() && !sensor2()) {
+          set_motors_speed(VEL_BASE, -VEL_BASE);
+        } else if (!sensor1() && sensor2()) {
+          set_motors_speed(-VEL_BASE, VEL_BASE);
+        } else if (!sensor1() && !sensor2()) {
+          set_motors_speed(VEL_BASE, VEL_BASE);
         }
-        // aqui aplicamos la correccion del pid a las velocidades de los motores
-        if (estrategia == ESTRAT_PID) {
-          vel = 0;
-        }
-        //Serial.println(correccion);
-        //return;
-        asignacion_vel_motores();
       }
-      calculo_vel_motores(vel, correccion);
 
       millisPID = millis();
     }
@@ -182,89 +167,89 @@ void loop() {
 
   } else {
     parar_motores();
-
-    if (boton()) {
-      pulsa = millis();
-      parpadeo = millis();
-      while (boton()) {
-        if ((millis() - pulsa) > 350) {
-           switch (estrategia) {
-          case ESTRAT_ADELANTE:
-            set_led_confirmado(RGB_TOP, true);
-            set_led_confirmado(RGB_RIGHT, false);
-            set_led_confirmado(RGB_LEFT, false);
-            break;
-          case ESTRAT_DERECHA:
-            set_led_confirmado(RGB_TOP, false);
-            set_led_confirmado(RGB_RIGHT, true);
-            set_led_confirmado(RGB_LEFT, false);
-            break;
-          case ESTRAT_IZQUIERDA:
-            set_led_confirmado(RGB_TOP, false);
-            set_led_confirmado(RGB_RIGHT, false);
-            set_led_confirmado(RGB_LEFT, true);
-            break;
-          case ESTRAT_ATRAS:
-            set_led_confirmado(RGB_TOP, false);
-            set_led_confirmado(RGB_RIGHT, true);
-            set_led_confirmado(RGB_LEFT, true);
-            break;
-          case ESTRAT_PID:
-            vel = VEL_BASE / 2.0;
-            set_led_confirmado(RGB_TOP, true);
-            set_led_confirmado(RGB_RIGHT, true);
-            set_led_confirmado(RGB_LEFT, true);
-            break;
-
-          default:
-            break;
-        }
-        }
-      }
-      tiempoPulsado = millis() - pulsa;
-    } else {
-      tiempoPulsado = 0;
-    }
-
-    if (tiempoPulsado > 0) {
-      if (tiempoPulsado < 350) {
-        estrategia = (estrategia + 1) % NUM_ESTRATEGIAS;
+    set_fan_speed(10);
+  }
+  if (boton()) {
+    pulsa = millis();
+    parpadeo = millis();
+    while (boton()) {
+      if ((millis() - pulsa) > 350) {
         switch (estrategia) {
           case ESTRAT_ADELANTE:
-            vel = VEL_BASE + 65;
-            set_led(RGB_TOP, true);
-            set_led(RGB_RIGHT, false);
-            set_led(RGB_LEFT, false);
+            set_led_confirmado(RGB_TOP, true);
+            set_led_confirmado(RGB_RIGHT, false);
+            set_led_confirmado(RGB_LEFT, false);
             break;
           case ESTRAT_DERECHA:
-            set_led(RGB_TOP, false);
-            set_led(RGB_RIGHT, true);
-            set_led(RGB_LEFT, false);
+            set_led_confirmado(RGB_TOP, false);
+            set_led_confirmado(RGB_RIGHT, true);
+            set_led_confirmado(RGB_LEFT, false);
             break;
           case ESTRAT_IZQUIERDA:
-            set_led(RGB_TOP, false);
-            set_led(RGB_RIGHT, false);
-            set_led(RGB_LEFT, true);
+            set_led_confirmado(RGB_TOP, false);
+            set_led_confirmado(RGB_RIGHT, false);
+            set_led_confirmado(RGB_LEFT, true);
             break;
           case ESTRAT_ATRAS:
-            set_led(RGB_TOP, false);
-            set_led(RGB_RIGHT, true);
-            set_led(RGB_LEFT, true);
+            set_led_confirmado(RGB_TOP, false);
+            set_led_confirmado(RGB_RIGHT, true);
+            set_led_confirmado(RGB_LEFT, true);
             break;
           case ESTRAT_PID:
             vel = VEL_BASE / 2.0;
-            set_led(RGB_TOP, true);
-            set_led(RGB_RIGHT, true);
-            set_led(RGB_LEFT, true);
+            set_led_confirmado(RGB_TOP, true);
+            set_led_confirmado(RGB_RIGHT, true);
+            set_led_confirmado(RGB_LEFT, true);
             break;
 
           default:
             break;
         }
-      } else if (tiempoPulsado >= 350 || is_started()){
-        set_starting(true);
-        start(millis());
       }
+    }
+    tiempoPulsado = millis() - pulsa;
+  } else {
+    tiempoPulsado = 0;
+  }
+
+  if (tiempoPulsado > 0) {
+    if (tiempoPulsado < 350) {
+      estrategia = (estrategia + 1) % NUM_ESTRATEGIAS;
+      switch (estrategia) {
+        case ESTRAT_ADELANTE:
+          vel = VEL_BASE + 65;
+          set_led(RGB_TOP, true);
+          set_led(RGB_RIGHT, false);
+          set_led(RGB_LEFT, false);
+          break;
+        case ESTRAT_DERECHA:
+          set_led(RGB_TOP, false);
+          set_led(RGB_RIGHT, true);
+          set_led(RGB_LEFT, false);
+          break;
+        case ESTRAT_IZQUIERDA:
+          set_led(RGB_TOP, false);
+          set_led(RGB_RIGHT, false);
+          set_led(RGB_LEFT, true);
+          break;
+        case ESTRAT_ATRAS:
+          set_led(RGB_TOP, false);
+          set_led(RGB_RIGHT, true);
+          set_led(RGB_LEFT, true);
+          break;
+        case ESTRAT_PID:
+          vel = VEL_BASE / 2.0;
+          set_led(RGB_TOP, true);
+          set_led(RGB_RIGHT, true);
+          set_led(RGB_LEFT, true);
+          break;
+
+        default:
+          break;
+      }
+    } else if (tiempoPulsado >= 350 || is_started()) {
+      set_starting(true);
+      start(millis());
     }
   }
 }
