@@ -25,6 +25,7 @@ void inicializar_motores() {
   ledcSetup(PWM_MOTOR_LEFT_A, PWM_MOTORS_HZ, PWM_MOTORS_RESOLUTION);
   ledcSetup(PWM_MOTOR_LEFT_B, PWM_MOTORS_HZ, PWM_MOTORS_RESOLUTION);
   ledcSetup(PWM_SUCTION, PWM_SUCTION_HZ, PWM_SUCTION_RESOLUTION);
+  ledcSetup(PWM_SERVO, PWM_SERVO_HZ, PWM_SERVO_RESOLUTION);
 
   // Asignación de los pines a los canales PWM
   ledcAttachPin(MOTOR_RIGHT_A, PWM_MOTOR_RIGHT_A);
@@ -32,6 +33,7 @@ void inicializar_motores() {
   ledcAttachPin(MOTOR_LEFT_A, PWM_MOTOR_LEFT_A);
   ledcAttachPin(MOTOR_LEFT_B, PWM_MOTOR_LEFT_B);
   ledcAttachPin(MOTOR_SUCTION, PWM_SUCTION);
+  ledcAttachPin(SERVO, PWM_SERVO);
 
   // Establece el valor inicial de los canales PWM
   ledcWrite(PWM_MOTOR_RIGHT_A, PWM_MOTORS_MIN);
@@ -39,6 +41,8 @@ void inicializar_motores() {
   ledcWrite(PWM_MOTOR_LEFT_A, PWM_MOTORS_MIN);
   ledcWrite(PWM_MOTOR_LEFT_B, PWM_MOTORS_MIN);
   ledcWrite(PWM_SUCTION, PWM_SUCTION_MIN);
+  // ledcWrite(PWM_SERVO, 150);
+
 
   // Tiempo de espera para inicialización del ESC; se puede comentar si se espera manualmente (calibrando, ajustando velocidad, etc.)
    delay(10000);
@@ -86,6 +90,12 @@ void set_motors_speed(float velI, float velD) {
     velD = 100;
   } else if (velD < -100) {
     velD = -100;
+    velD += 15;
+  }
+  if(velD > 0){
+    velD -= 15;
+  }else if(velD < 0){
+    velD += 15;
   }
 
   if (velD > 0) {
@@ -98,10 +108,10 @@ void set_motors_speed(float velI, float velD) {
 }
 void parar_motores() {
 
-  digitalWrite(MOTOR_RIGHT_A, HIGH);
-  digitalWrite(MOTOR_RIGHT_B, HIGH);
-  digitalWrite(MOTOR_LEFT_A, HIGH);
-  digitalWrite(MOTOR_LEFT_B, HIGH);
+  ledcWrite(PWM_MOTOR_RIGHT_A, PWM_MOTORS_MIN);
+  ledcWrite(PWM_MOTOR_RIGHT_B, PWM_MOTORS_MIN);
+  ledcWrite(PWM_MOTOR_LEFT_A, PWM_MOTORS_MIN);
+  ledcWrite(PWM_MOTOR_LEFT_B, PWM_MOTORS_MIN);
 }
 
 /**

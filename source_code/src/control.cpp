@@ -26,8 +26,8 @@ long ms_started() {
  *
  * @param starting Indica si la carrera está iniciando.
  */
-void set_starting(bool _starting) {
-  starting = __assert_func;
+void set_starting(bool status) {
+  starting = status;
 }
 /**
  * @brief Comprueba si la carrera está iniciando.

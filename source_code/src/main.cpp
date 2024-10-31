@@ -15,14 +15,13 @@
 #define ESTRAT_PID 4
 
 // Variables PID
-#define VEL_BASE 100
+#define VEL_BASE 0
 #define VEL_SUCCION 100
 #define TIEMPO_PID 4
 #define KP 3
 #define KD 6.0
 #define KI 0
-
-#define ANULAR_LINEA 1 // 0 = ANULADO / 1 = NO ANULADO (1 PARA COMPETIR, 0 PARA PRUEBAS SIN DOYHO)
+#define ANULAR_LINEA 1 // 1 = ANULADO / 0 = NO ANULADO (0 PARA COMPETIR, 1 PARA PRUEBAS SIN DOYHO)
 
 int proporcional = 0;
 int derivada = 0;
@@ -72,74 +71,40 @@ void loop() {
   }
   if ((is_started() && (millis() - ms_started() > 0)) && is_started()) {
 
-    set_fan_speed(VEL_SUCCION);
+    // ledcWrite(PWM_SERVO, 190);
+    // set_fan_speed(VEL_SUCCION);
+    // set_motors_speed(100, 100);
 
     if (millis() >= millisPID + 1) {
       filtro_sensores();
 
-      if (!sensor_linea_D() && ANULAR_LINEA) {
-        secuencia_linea_D();
-        usar_PID = true;
-        vel = VEL_BASE;
-        correccion = 0;
-        posicion_anterior = 0;
-      } else if (!sensor_linea_I() && ANULAR_LINEA) {
-        secuencia_linea_I();
-        usar_PID = true;
-        vel = VEL_BASE;
-        correccion = 0;
-        posicion_anterior = 0;
-      } else if (sensor1() || sensor2() || sensor3() || sensor4()) {
-        usar_PID = true;
-        if (!sensor3()) {
-          vel = VEL_BASE;
-        }
-      }
-      if (!estrategiaRealizada) {
-        estrategiaRealizada = true;
-        switch (estrategia) {
-          case ESTRAT_ADELANTE:
-            vel = VEL_BASE + 65;
-            delay(20);
-            break;
-          case ESTRAT_DERECHA:
-            arranque_derecha();
-            break;
-          case ESTRAT_IZQUIERDA:
-            arranque_izquierda();
-            break;
-          case ESTRAT_ATRAS:
-            arranque_espaldas();
-            break;
-        }
-        vel = VEL_BASE;
-      }
-      contador = (contador + 1) % TIEMPO_PID; // Avanza el índice circularmente cuando supera TIEMPO_PID vuelve a ser 0
+      ledcWrite(PWM_SERVO, 190);
+      set_fan_speed(VEL_SUCCION);
 
-      if (contador == 0) { // Este if se ejecuta una vez cada tiempo establecido en TIEMPO_PID en ms
-
-        // imprimir_sensores_raw();
-        // imprimir_sensores_filtrados();
-        // Serial.println(posicion_rival_chusta());
-        // delay(100);
-        // return;
-        //////////////////////////////
-        ////    Calculo del PID   ////
-        //////////////////////////////
-        // Serial.println(usar_PID);
-        if (sensor1() && sensor2()) {
-          set_motors_speed(VEL_BASE, VEL_BASE);
-        } else if (sensor1() && !sensor2()) {
-          set_motors_speed(VEL_BASE, -VEL_BASE);
-        } else if (!sensor1() && sensor2()) {
-          set_motors_speed(-VEL_BASE, VEL_BASE);
-        } else if (!sensor1() && !sensor2()) {
-          set_motors_speed(VEL_BASE, VEL_BASE);
-        }
+      if (sensor_linea_D() && !ANULAR_LINEA) {
+        set_motors_speed(-100, -100);
+        delay(500);
+        set_motors_speed(-100, 100);
+        delay(500);
+      } else if (sensor_linea_I() && !ANULAR_LINEA) {
+        set_motors_speed(-100, -100);
+        delay(500);
+        set_motors_speed(100, -100);
+        delay(500);
+      } else if (sensor1() && sensor2()) {
+        set_motors_speed(100, 100);
+      } else if (sensor1()) {
+        set_motors_speed(-100, 100);
+      } else if (sensor2()) {
+        set_motors_speed(100, -100);
+      } else {
+        set_motors_speed(100, -100);
       }
 
       millisPID = millis();
     }
+
+    return;
 
   } else if (is_started() && (millis() - ms_started() > 4000)) {
 

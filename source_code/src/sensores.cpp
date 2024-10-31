@@ -90,7 +90,6 @@ void filtro_sensores_histeresis() {
     }
     s_rival_2_bool = false;
   }
-  
 
   // Filtro para intentar evitar la perdida de deteccion cuando el robot rival esta mas cerca de 4cm (limite de los sensores)
   if (!s_rival_1_bool && !s_rival_2_bool && !s_rival_3_bool && !s_rival_4_bool) {
@@ -168,27 +167,27 @@ int sensor4_analog() {
 }
 
 bool sensor_linea_I() {
-  if (!digitalRead(S_LINEA_I)) {
+  if (analogRead(S_LINEA_I) < 3000) {
     contador_linea_I++;
   } else {
     contador_linea_I = 0;
   }
   if (contador_linea_I >= CONTADOR_LINEA) {
-    return false;
-  } else {
     return true;
+  } else {
+    return false;
   }
 }
 bool sensor_linea_D() {
-  if (!digitalRead(S_LINEA_D)) {
+  if (analogRead(S_LINEA_D) < 3000) {
     contador_linea_D++;
   } else {
     contador_linea_D = 0;
   }
   if (contador_linea_D >= CONTADOR_LINEA) {
-    return false;
-  } else {
     return true;
+  } else {
+    return false;
   }
 }
 bool boton() {

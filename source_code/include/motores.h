@@ -5,6 +5,7 @@
 #include "sensores.h"
 
 
+
 /**
  * @brief Configuración de los motores de tracción.
  * Canales: 0 a 3
@@ -35,6 +36,19 @@
 #define PWM_SUCTION_RESOLUTION 11
 #define PWM_SUCTION_MAX 204
 #define PWM_SUCTION_MIN 102
+/**
+ * @brief Configuración del motor de succión.
+ * Canal: 4
+ * Frecuencia: 50 Hz
+ * Resolución: 11 bits
+ * Rango: 102 a 204 (1000us a 2000us del Protocolo Servo)
+ *
+ */
+#define PWM_SERVO 5
+#define PWM_SERVO_HZ 50
+#define PWM_SERVO_RESOLUTION 11
+#define PWM_SERVO_MAX 204
+#define PWM_SERVO_MIN 102
 
 
 

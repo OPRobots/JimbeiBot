@@ -20,6 +20,7 @@ void inicializar_pines() {
 
   pinMode(NEOPIXEL, OUTPUT);
 
+
   pinMode(BOTON, INPUT_PULLDOWN);
   pinMode(MOD_START, INPUT);
   attachInterrupt(digitalPinToInterrupt(MOD_START), rc5_isr, CHANGE);

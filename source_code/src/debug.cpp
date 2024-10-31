@@ -5,7 +5,8 @@
 int modo_debug = 0;
 
 void debug_inicio() {
-  imprimir_sensores_filtrados();
+  // imprimir_sensores_filtrados();
+    imprimir_sensores_raw();
   // sensor1();
   return;
 
@@ -62,15 +63,14 @@ void debug_inicio() {
   }
 }
 
-void imprimir_sensores_raw() {
+void  imprimir_sensores_raw() {
   Serial.print(analogRead(S_RIVAL_1));
   Serial.print(" ");
   Serial.print(analogRead(S_RIVAL_2));
   Serial.print(" ");
-
-  Serial.print(digitalRead(S_LINEA_I));
+  Serial.print(analogRead(S_LINEA_I));
   Serial.print(" ");
-  Serial.println(digitalRead(S_LINEA_D));
+  Serial.println(analogRead(S_LINEA_D));
   delay(125);
 }
 
