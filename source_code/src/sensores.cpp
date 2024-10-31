@@ -2,8 +2,8 @@
 
 const int MAGNITUD_FILTRO = 25;
 const int MAGNITUD_FILTRO_TEMPORAL = 20; // Tiempo en ms para cambiar de estado el sensor
-const int UMBRAL = 1600;
-const int UMBRAL_HISTERESIS = 1200;
+const int UMBRAL = 950;
+const int UMBRAL_HISTERESIS = 850;
 const int CONTADOR_LINEA = 6;
 
 int posicion = 0;

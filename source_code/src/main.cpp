@@ -21,7 +21,7 @@
 #define KP 3
 #define KD 6.0
 #define KI 0
-#define ANULAR_LINEA 1 // 1 = ANULADO / 0 = NO ANULADO (0 PARA COMPETIR, 1 PARA PRUEBAS SIN DOYHO)
+#define ANULAR_LINEA 0 // 1 = ANULADO / 0 = NO ANULADO (0 PARA COMPETIR, 1 PARA PRUEBAS SIN DOYHO)
 
 int proporcional = 0;
 int derivada = 0;
@@ -81,12 +81,12 @@ void loop() {
       ledcWrite(PWM_SERVO, 190);
       set_fan_speed(VEL_SUCCION);
 
-      if (sensor_linea_D() && !ANULAR_LINEA) {
+      if (!sensor_linea_D() && !ANULAR_LINEA) {
         set_motors_speed(-100, -100);
         delay(500);
         set_motors_speed(-100, 100);
         delay(500);
-      } else if (sensor_linea_I() && !ANULAR_LINEA) {
+      } else if (!sensor_linea_I() && !ANULAR_LINEA) {
         set_motors_speed(-100, -100);
         delay(500);
         set_motors_speed(100, -100);
