@@ -54,6 +54,8 @@ static uint16_t cmd = 1;
 static uint8_t bits = 1;
 static uint32_t last_us = 0;
 
+static bool prog_done = false;
+
 static void rc5_manage_command(uint16_t message) {
   // unsigned char toggle = (message & TOGGLE_MASK) >> TOGGLE_SHIFT;
   unsigned char address = (message & ADDRESS_MASK) >> ADDRESS_SHIFT;
@@ -62,6 +64,7 @@ static void rc5_manage_command(uint16_t message) {
      case ADDRESS_PROG:
        rc5_stored_data[0] = command;
        rc5_stored_data[1] = command + 1;
+       prog_done = true;
        break;
     case ADDRESS_COMP:
       if (command == rc5_stored_data[DATA_START]) {
@@ -139,4 +142,12 @@ void rc5_update(void) {
     pin_state = new_pin_state;
     rc5_register(pin_state ? RC5_TRIGGER_RISING : RC5_TRIGGER_FALLING);
   }
+}
+
+bool rc5_is_prog_done(void){
+  return prog_done;
+}
+
+void rc5_reset_prog_done(void){
+  prog_done  =false;
 }

@@ -69,7 +69,15 @@ void loop() {
     debug_inicio();
     return;
   }
+    if(rc5_is_prog_done()){
+        long ms = millis();
+        while(millis()-ms < 1000){
+          blink_led(RGB_TOP, 0, 0, 0, 50);
+        }
+        rc5_reset_prog_done();
+    }
   if ((is_started() && (millis() - ms_started() > 0)) && is_started()) {
+
 
     // ledcWrite(PWM_SERVO, 190);
     // set_fan_speed(VEL_SUCCION);
@@ -81,12 +89,12 @@ void loop() {
       ledcWrite(PWM_SERVO, 190);
       set_fan_speed(VEL_SUCCION);
 
-      if (!sensor_linea_D() && !ANULAR_LINEA) {
+      if (sensor_linea_D() && !ANULAR_LINEA) {
         set_motors_speed(-100, -100);
         delay(500);
         set_motors_speed(-100, 100);
         delay(500);
-      } else if (!sensor_linea_I() && !ANULAR_LINEA) {
+      } else if (sensor_linea_I() && !ANULAR_LINEA) {
         set_motors_speed(-100, -100);
         delay(500);
         set_motors_speed(100, -100);
